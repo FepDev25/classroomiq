@@ -11,6 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
  * Traduce excepciones a respuestas {@link ProblemDetail} (RFC 7807) con el código HTTP correcto.
@@ -66,6 +67,12 @@ public class ApiExceptionHandler {
     public ProblemDetail handleCuerpoIlegible(HttpMessageNotReadableException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
                 "El cuerpo de la solicitud no se pudo leer o está mal formado");
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ProblemDetail handleArchivoMuyGrande(MaxUploadSizeExceededException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE,
+                "El archivo o la solicitud superan el tamaño máximo permitido");
     }
 
     @ExceptionHandler(Exception.class)
