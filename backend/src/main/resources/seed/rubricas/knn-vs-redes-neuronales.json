@@ -1,0 +1,57 @@
+{
+  "nombre": "Optimización: KNN vs Redes Neuronales",
+  "materia": "Machine Learning",
+  "descripcion": "Práctica de clasificación de patrones: preprocesamiento de variables, desarrollo y optimización de una red neuronal con Keras, comparación con KNN, predicción con nuevos ejemplos y conclusiones con referencias APA. Entrega: cuaderno Jupyter (.ipynb). Los niveles tienen puntaje fijo y el total es el promedio de los criterios (cada uno sobre 10).",
+  "puntajeTotal": 10,
+  "modoTotal": "promedio",
+  "criterios": [
+    {
+      "nombre": "Optimización de la red neuronal",
+      "descripcion": "Desarrolla y evalúa un modelo de red neuronal con Keras, probando distintos hiperparámetros (epochs, batch, funciones de activación, neuronas y capas) e indicando claramente el mejor resultado obtenido.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "fijo", "valor": 10, "descripcion": "La evaluación del modelo de red neuronal es exhaustiva y precisa. Se indica el mejor resultado claramente." },
+        { "nombre": "Bueno", "tipoPuntaje": "fijo", "valor": 6, "descripcion": "La evaluación del modelo de red neuronal es adecuada." },
+        { "nombre": "Aceptable", "tipoPuntaje": "fijo", "valor": 4, "descripcion": "La evaluación del modelo de red neuronal es insatisfactoria." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "fijo", "valor": 0, "descripcion": "No se desarrolla ni evalúa el modelo de red neuronal." }
+      ]
+    },
+    {
+      "nombre": "Comparación de modelos con resultados y figuras",
+      "descripcion": "Compara KNN y red neuronal con métricas (accuracy, precision, recall, F1) y visualizaciones de la optimización, de forma clara y completa.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "fijo", "valor": 10, "descripcion": "La comparación de modelos es clara y completa." },
+        { "nombre": "Bueno", "tipoPuntaje": "fijo", "valor": 6, "descripcion": "La comparación de modelos es adecuada." },
+        { "nombre": "Aceptable", "tipoPuntaje": "fijo", "valor": 4, "descripcion": "La comparación de modelos puede ser poco clara o insuficiente." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "fijo", "valor": 0, "descripcion": "La comparación de modelos es insatisfactoria o está ausente." }
+      ]
+    },
+    {
+      "nombre": "Predicción con nuevos ejemplos",
+      "descripcion": "Realiza la predicción con un nuevo ejemplo (usuario) usando el modelo de red neuronal, de forma eficiente y precisa.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "fijo", "valor": 10, "descripcion": "La realización de la predicción es eficiente y precisa." },
+        { "nombre": "Bueno", "tipoPuntaje": "fijo", "valor": 6, "descripcion": "La realización de la predicción es satisfactoria." },
+        { "nombre": "Aceptable", "tipoPuntaje": "fijo", "valor": 4, "descripcion": "Puede haber problemas en la realización de la predicción." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "fijo", "valor": 0, "descripcion": "La realización de la predicción es insatisfactoria o está ausente." }
+      ]
+    },
+    {
+      "nombre": "Conclusiones y referencias",
+      "descripcion": "Presenta conclusiones claras y relevantes basadas en los resultados obtenidos, con referencias en formato APA.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "fijo", "valor": 10, "descripcion": "Conclusiones claras y relevantes basadas en los resultados, con referencias en formato APA." },
+        { "nombre": "Bueno", "tipoPuntaje": "fijo", "valor": 6, "descripcion": "Se presentan conclusiones adecuadas, pero sin referencias." },
+        { "nombre": "Aceptable", "tipoPuntaje": "fijo", "valor": 4, "descripcion": "Las conclusiones pueden ser poco claras o insuficientes." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "fijo", "valor": 0, "descripcion": "Las conclusiones son insatisfactorias o están ausentes." }
+      ]
+    }
+  ]
+}
