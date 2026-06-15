@@ -1,0 +1,55 @@
+{
+  "rubrica": "informe-proyecto-software.json",
+  "descripcion": "Ground truth: nivel y puntaje esperado por criterio para cada entrega ficticia. Sirve para validar el motor de evaluación (Fase 4): el borrador del LLM debería coincidir con estos niveles, con tolerancia de ±1 nivel y el puntaje dentro del rango del nivel esperado.",
+  "toleranciaNivel": 1,
+  "entregas": [
+    {
+      "archivo": "entrega-01-excelente.md",
+      "perfil": "Excelente y consistente en todos los criterios.",
+      "totalEsperado": 20,
+      "criterios": [
+        { "criterio": "Definición del problema y requisitos", "nivelEsperado": "Excelente", "puntajeEsperado": 4 },
+        { "criterio": "Diseño de la arquitectura", "nivelEsperado": "Excelente", "puntajeEsperado": 5 },
+        { "criterio": "Justificación de decisiones técnicas", "nivelEsperado": "Excelente", "puntajeEsperado": 5 },
+        { "criterio": "Fundamentación teórica y referencias", "nivelEsperado": "Excelente", "puntajeEsperado": 3 },
+        { "criterio": "Claridad, estructura y ortografía", "nivelEsperado": "Excelente", "puntajeEsperado": 3 }
+      ]
+    },
+    {
+      "archivo": "entrega-02-bueno.md",
+      "perfil": "Sólido pero sin profundidad: requisito no funcional vago, sin diagrama, sin comparar alternativas, integración parcial de referencias.",
+      "totalEsperado": 16,
+      "criterios": [
+        { "criterio": "Definición del problema y requisitos", "nivelEsperado": "Bueno", "puntajeEsperado": 3 },
+        { "criterio": "Diseño de la arquitectura", "nivelEsperado": "Bueno", "puntajeEsperado": 4 },
+        { "criterio": "Justificación de decisiones técnicas", "nivelEsperado": "Bueno", "puntajeEsperado": 4 },
+        { "criterio": "Fundamentación teórica y referencias", "nivelEsperado": "Bueno", "puntajeEsperado": 2 },
+        { "criterio": "Claridad, estructura y ortografía", "nivelEsperado": "Excelente", "puntajeEsperado": 3 }
+      ]
+    },
+    {
+      "archivo": "entrega-03-basico.md",
+      "perfil": "Requisitos vagos, lista de tecnologías sin responsabilidades ni interacción, justificación genérica ('es popular'), sin referencias. Estructura tidy con ortografía correcta.",
+      "totalEsperado": 8,
+      "criterios": [
+        { "criterio": "Definición del problema y requisitos", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Diseño de la arquitectura", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Justificación de decisiones técnicas", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Fundamentación teórica y referencias", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 },
+        { "criterio": "Claridad, estructura y ortografía", "nivelEsperado": "Bueno", "puntajeEsperado": 2 }
+      ]
+    },
+    {
+      "archivo": "entrega-04-insuficiente.md",
+      "perfil": "Apenas menciona el problema, sin requisitos, sin arquitectura, sin justificación ni referencias, texto desorganizado con errores ortográficos.",
+      "totalEsperado": 1,
+      "criterios": [
+        { "criterio": "Definición del problema y requisitos", "nivelEsperado": "Insuficiente", "puntajeEsperado": 1 },
+        { "criterio": "Diseño de la arquitectura", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 },
+        { "criterio": "Justificación de decisiones técnicas", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 },
+        { "criterio": "Fundamentación teórica y referencias", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 },
+        { "criterio": "Claridad, estructura y ortografía", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 }
+      ]
+    }
+  ]
+}
