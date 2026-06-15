@@ -100,6 +100,16 @@ class AuthAndUsuarioFlowTest {
     }
 
     @Test
+    void loginSinContrasenaEsBadRequest() throws Exception {
+        String body = json.writeValueAsString(Map.of("email", adminEmail)); // falta password
+
+        mvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void docenteNoPuedeAccederAEndpointsDeAdmin() throws Exception {
         String docenteEmail = "doc-" + UUID.randomUUID() + "@test.io";
         crearUsuario(docenteEmail, "docente123", Rol.DOCENTE);
