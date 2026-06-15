@@ -1,0 +1,57 @@
+{
+  "nombre": "Tarea: Implementación de una Pila (Python)",
+  "materia": "Estructuras de Datos",
+  "descripcion": "Tarea de programación pura (entrega tipo CÓDIGO): implementar una estructura de datos Pila (LIFO) en Python con sus pruebas automatizadas y documentación de uso. Sirve para validar el pipeline de código del motor (Fase 4): ZIP → extracción → detección de lenguaje → chunking por archivo → evaluación por criterio.",
+  "puntajeTotal": 20,
+  "modoTotal": "suma",
+  "criterios": [
+    {
+      "nombre": "Correctitud de la implementación",
+      "descripcion": "La clase Pila implementa correctamente apilar (push), desapilar (pop), tope (peek), esta_vacia y tamano. Maneja el error de desapilar/consultar una pila vacía con una excepción clara en vez de fallar de forma silenciosa o con un error genérico.",
+      "puntajeMaximo": 8,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "RANGO", "puntajeMin": 7, "puntajeMax": 8, "descripcion": "Todas las operaciones son correctas y la pila vacía se maneja con una excepción específica y mensaje claro. Semántica LIFO impecable." },
+        { "nombre": "Bueno", "tipoPuntaje": "RANGO", "puntajeMin": 5, "puntajeMax": 6, "descripcion": "Operaciones correctas pero el manejo de la pila vacía es parcial (excepción genérica o solo en una de las operaciones)." },
+        { "nombre": "Básico", "tipoPuntaje": "RANGO", "puntajeMin": 3, "puntajeMax": 4, "descripcion": "La estructura funciona en el caso feliz pero falta alguna operación o no contempla la pila vacía." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "RANGO", "puntajeMin": 0, "puntajeMax": 2, "descripcion": "Implementación incompleta o con errores que rompen la semántica LIFO." }
+      ]
+    },
+    {
+      "nombre": "Pruebas automatizadas",
+      "descripcion": "Existen pruebas (unittest o pytest) que cubren las operaciones principales y al menos un caso de borde (desapilar pila vacía). Las pruebas son ejecutables y verifican comportamiento, no solo que el código no falle.",
+      "puntajeMaximo": 5,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "RANGO", "puntajeMin": 5, "puntajeMax": 5, "descripcion": "Pruebas claras que cubren operaciones normales y casos de borde, incluida la excepción de pila vacía." },
+        { "nombre": "Bueno", "tipoPuntaje": "RANGO", "puntajeMin": 4, "puntajeMax": 4, "descripcion": "Pruebas de las operaciones principales pero sin cubrir casos de borde." },
+        { "nombre": "Básico", "tipoPuntaje": "RANGO", "puntajeMin": 2, "puntajeMax": 3, "descripcion": "Pruebas mínimas o superficiales (uno o dos asserts)." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "RANGO", "puntajeMin": 0, "puntajeMax": 1, "descripcion": "Sin pruebas o no ejecutables." }
+      ]
+    },
+    {
+      "nombre": "Calidad de código",
+      "descripcion": "Nombres descriptivos, docstrings en la clase y métodos públicos, separación de responsabilidades (la estructura en su propio módulo) y ausencia de código muerto o duplicado.",
+      "puntajeMaximo": 4,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "RANGO", "puntajeMin": 4, "puntajeMax": 4, "descripcion": "Código limpio, bien nombrado, documentado y modular." },
+        { "nombre": "Bueno", "tipoPuntaje": "RANGO", "puntajeMin": 3, "puntajeMax": 3, "descripcion": "Código legible con documentación parcial o módulo único razonable." },
+        { "nombre": "Básico", "tipoPuntaje": "RANGO", "puntajeMin": 2, "puntajeMax": 2, "descripcion": "Funciona pero con nombres pobres, sin docstrings o con código mezclado." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "RANGO", "puntajeMin": 0, "puntajeMax": 1, "descripcion": "Código desordenado, sin estructura ni documentación." }
+      ]
+    },
+    {
+      "nombre": "Documentación de uso (README)",
+      "descripcion": "Incluye un README que explica qué hace el proyecto, cómo ejecutarlo y cómo correr las pruebas, con un ejemplo mínimo de uso.",
+      "puntajeMaximo": 3,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "RANGO", "puntajeMin": 3, "puntajeMax": 3, "descripcion": "README completo: descripción, ejecución, pruebas y ejemplo de uso." },
+        { "nombre": "Bueno", "tipoPuntaje": "RANGO", "puntajeMin": 2, "puntajeMax": 2, "descripcion": "README presente pero incompleto (falta el ejemplo o cómo correr pruebas)." },
+        { "nombre": "Básico", "tipoPuntaje": "RANGO", "puntajeMin": 1, "puntajeMax": 1, "descripcion": "README mínimo de una o dos líneas." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "RANGO", "puntajeMin": 0, "puntajeMax": 0, "descripcion": "Sin README." }
+      ]
+    }
+  ]
+}

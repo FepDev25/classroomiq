@@ -1,0 +1,52 @@
+{
+  "rubrica": "rubrica.json",
+  "descripcion": "Ground truth de CÓDIGO: nivel y puntaje esperado por criterio para cada proyecto ficticio. Valida el motor de evaluación (Fase 4) sobre el pipeline de código (ZIP → extracción → chunking por archivo). Cada entrega es un directorio de archivos fuente que se sube como una entrega tipo CODIGO (comprimida en .zip). Tolerancia: ±1 nivel; el puntaje debe caer dentro del rango del nivel esperado.",
+  "tipoEntrega": "CODIGO",
+  "toleranciaNivel": 1,
+  "entregas": [
+    {
+      "archivo": "entrega-01-excelente/",
+      "perfil": "Implementación completa y limpia, manejo de pila vacía con excepción propia, pruebas con casos de borde y README completo.",
+      "totalEsperado": 20,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Excelente", "puntajeEsperado": 8 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Excelente", "puntajeEsperado": 5 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Excelente", "puntajeEsperado": 4 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Excelente", "puntajeEsperado": 3 }
+      ]
+    },
+    {
+      "archivo": "entrega-02-bueno/",
+      "perfil": "Operaciones correctas pero manejo de vacío parcial (excepción genérica en desapilar, tope sin guarda), pruebas de operaciones principales sin casos de borde, README incompleto sin ejemplo ni instrucciones de pruebas.",
+      "totalEsperado": 15,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Bueno", "puntajeEsperado": 6 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Bueno", "puntajeEsperado": 4 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Bueno", "puntajeEsperado": 3 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Bueno", "puntajeEsperado": 2 }
+      ]
+    },
+    {
+      "archivo": "entrega-03-basico/",
+      "perfil": "Funciona en el caso feliz pero falta la operación tope y no contempla la pila vacía; pruebas mínimas (un par de asserts sueltos); nombres pobres y sin docstrings; sin README.",
+      "totalEsperado": 8,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Básico", "puntajeEsperado": 4 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 }
+      ]
+    },
+    {
+      "archivo": "entrega-04-insuficiente/",
+      "perfil": "Implementación que rompe la semántica LIFO (desapila el primer elemento), faltan operaciones, sin pruebas y sin README.",
+      "totalEsperado": 3,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Insuficiente", "puntajeEsperado": 2 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Insuficiente", "puntajeEsperado": 1 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 }
+      ]
+    }
+  ]
+}
