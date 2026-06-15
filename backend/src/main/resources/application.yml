@@ -44,6 +44,10 @@ app:
     issuer: classroomiq
     secret: ${JWT_SECRET:dev-only-secret-change-me-please-32bytes-minimum-aaaaaaaa}
     access-token-ttl: PT1H
+  # Siembra de datos de demo al arrancar (institución + admin + docente + rúbricas de ejemplo).
+  # Idempotente: solo siembra si la base está vacía. Desactivado en prod y en tests.
+  seed:
+    enabled: ${SEED_ENABLED:true}
 
 logging:
   level:
