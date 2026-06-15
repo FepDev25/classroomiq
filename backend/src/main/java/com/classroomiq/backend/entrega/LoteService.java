@@ -78,7 +78,7 @@ public class LoteService {
         storage.borrarLote(auth.requireTenantId(), lote.getMateriaId(), lote.getId());
     }
 
-    Lote cargarPropio(UUID id) {
+    public Lote cargarPropio(UUID id) {
         return lotes.findByIdAndDocenteId(id, auth.requireUserId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Lote no encontrado"));
     }
