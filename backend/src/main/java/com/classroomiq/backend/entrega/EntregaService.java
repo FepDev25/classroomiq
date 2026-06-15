@@ -135,7 +135,7 @@ public class EntregaService {
 
     private RolArchivo clasificar(MultipartFile archivo) {
         String nombre = nombreOriginal(archivo).toLowerCase();
-        if (nombre.endsWith(".pdf") || nombre.endsWith(".docx") || nombre.endsWith(".doc")) {
+        if (nombre.endsWith(".pdf") || nombre.endsWith(".docx")) {
             return RolArchivo.DOCUMENTO;
         }
         if (nombre.endsWith(".zip")) {
