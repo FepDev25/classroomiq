@@ -1,0 +1,87 @@
+{
+  "nombre": "Proyecto Integrador FotoFlux 3.0",
+  "materia": "Computación Paralela",
+  "descripcion": "Aplicación social de imágenes con procesamiento de filtros de convolución en GPU (CUDA/PyCUDA), backend reactivo con Spring WebFlux, autenticación y almacenamiento con Supabase, app móvil y despliegue con Docker Compose. Entrega mixta: código fuente (multi-componente) + informe técnico.",
+  "puntajeTotal": 25,
+  "modoTotal": "suma",
+  "criterios": [
+    {
+      "nombre": "Procesamiento de imágenes con CUDA/PyCUDA",
+      "descripcion": "El estudiante implementa filtros de convolución que se ejecutan en GPU mediante kernels CUDA/PyCUDA (no con librerías de alto nivel). Incluye los 3 filtros de prácticas anteriores y 3 filtros nuevos, al menos uno con una identidad visual temática propia. Usa correctamente memoria host/device, bloques, hilos, grid y validación de límites, y registra métricas por procesamiento (filtro, tamaño, bloque, grid, hilos, tiempo de kernel, estado).",
+      "puntajeMaximo": 6,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "bandaPct", "pctMin": 90, "pctMax": 100, "descripcion": "Implementación completa y optimizada de los filtros en GPU (3 previos + 3 nuevos, al menos uno con identidad visual temática propia). Funcionamiento correcto, eficiente y documentado. Uso adecuado de PyCUDA, kernels, memoria host/device, bloques, hilos, grid, validación de límites y registro de métricas GPU." },
+        { "nombre": "Muy bueno", "tipoPuntaje": "bandaPct", "pctMin": 75, "pctMax": 89, "descripcion": "Implementación adecuada con funcionamiento correcto de la mayoría de los filtros, pero con margen de optimización. Uso adecuado de PyCUDA, con detalles por mejorar en documentación, configuración CUDA o registro de métricas." },
+        { "nombre": "Bueno", "tipoPuntaje": "bandaPct", "pctMin": 60, "pctMax": 74, "descripcion": "Implementación básica con algunos filtros limitados o errores menores. Uso parcial de PyCUDA. Explicación insuficiente de bloques, hilos, grid o transferencia de memoria." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "bandaPct", "pctMin": 45, "pctMax": 59, "descripcion": "Implementación deficiente, con errores importantes en filtros o mal uso de PyCUDA. Poca evidencia de ejecución real en GPU. Documentación escasa." },
+        { "nombre": "No logrado", "tipoPuntaje": "bandaPct", "pctMin": 0, "pctMax": 44, "descripcion": "Implementación incorrecta o no realizada. Los filtros no funcionan o no se evidencia uso de CUDA/PyCUDA." }
+      ]
+    },
+    {
+      "nombre": "Backend reactivo con WebFlux + Supabase",
+      "descripcion": "El estudiante desarrolla la API con Spring WebFlux aplicando programación reactiva y no bloqueante. El backend integra Supabase, el servicio CUDA/PyCUDA, publicaciones, likes, comentarios, historial de procesamiento y métricas GPU. No se limita a CRUD: actúa como componente integrador. Maneja validaciones y errores.",
+      "puntajeMaximo": 5,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "bandaPct", "pctMin": 90, "pctMax": 100, "descripcion": "Desarrollo completo y eficiente de la API con WebFlux. Integración correcta con Supabase, servicio CUDA/PyCUDA, publicaciones, likes, comentarios, historial y métricas GPU. Manejo adecuado de programación reactiva, validaciones y errores." },
+        { "nombre": "Muy bueno", "tipoPuntaje": "bandaPct", "pctMin": 75, "pctMax": 89, "descripcion": "API funcional con WebFlux y Supabase, con deficiencias menores en manejo reactivo, validaciones o estructura del código. Funcionalidades principales completas." },
+        { "nombre": "Bueno", "tipoPuntaje": "bandaPct", "pctMin": 60, "pctMax": 74, "descripcion": "API básica con funcionalidades parciales, errores menores y uso limitado de programación reactiva. Integración incompleta con Supabase o con el servicio CUDA/PyCUDA." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "bandaPct", "pctMin": 45, "pctMax": 59, "descripcion": "API deficiente con errores significativos, sin aprovechar la programación reactiva. Funcionalidades incompletas o integración débil entre componentes." },
+        { "nombre": "No logrado", "tipoPuntaje": "bandaPct", "pctMin": 0, "pctMax": 44, "descripcion": "API no desarrollada o sin integración funcional con Supabase ni con el servicio CUDA/PyCUDA." }
+      ]
+    },
+    {
+      "nombre": "Supabase Auth, Storage y PostgreSQL",
+      "descripcion": "El estudiante integra Supabase Auth (registro, login, logout, usuario autenticado, protección de operaciones), Supabase Storage (imagen original y procesada, URL pública/firmada, asociación a publicación e historial) y un modelo relacional PostgreSQL que gestiona usuarios/perfiles, publicaciones, comentarios, likes, filtros, historial y métricas GPU.",
+      "puntajeMaximo": 3,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "bandaPct", "pctMin": 90, "pctMax": 100, "descripcion": "Integración completa y correcta de Auth, Storage y PostgreSQL. Modelo relacional bien diseñado que gestiona usuarios, perfiles, publicaciones, comentarios, likes, filtros, historial y métricas GPU." },
+        { "nombre": "Muy bueno", "tipoPuntaje": "bandaPct", "pctMin": 75, "pctMax": 89, "descripcion": "Integración funcional con Supabase, con detalles menores por corregir en autenticación, almacenamiento multimedia o diseño relacional." },
+        { "nombre": "Bueno", "tipoPuntaje": "bandaPct", "pctMin": 60, "pctMax": 74, "descripcion": "Integración básica. Algunas funcionalidades incompletas o modelo relacional limitado." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "bandaPct", "pctMin": 45, "pctMax": 59, "descripcion": "Integración deficiente, con errores importantes en autenticación, almacenamiento o persistencia de datos." },
+        { "nombre": "No logrado", "tipoPuntaje": "bandaPct", "pctMin": 0, "pctMax": 44, "descripcion": "No se utiliza correctamente Supabase o no existe una base de datos relacional funcional." }
+      ]
+    },
+    {
+      "nombre": "Aplicación móvil",
+      "descripcion": "El estudiante desarrolla la app móvil (Flutter, Ionic o Android nativo) con registro/login, feed, carga de imágenes, selección de filtro, solicitud de procesamiento GPU, publicación, likes, comentarios, perfil e historial de procesamiento. La interfaz debe ser clara y coherente con una plataforma social de imágenes. Nota: la calidad estética/UX de la interfaz requiere juicio del docente; el contenido del código permite evaluar la presencia y corrección de las funcionalidades.",
+      "puntajeMaximo": 4,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "bandaPct", "pctMin": 90, "pctMax": 100, "descripcion": "App completa y funcional con todas las características principales (registro, login, carga, filtros, publicación, feed, likes, comentarios, perfil, historial). Interfaz atractiva y experiencia de usuario fluida." },
+        { "nombre": "Muy bueno", "tipoPuntaje": "bandaPct", "pctMin": 75, "pctMax": 89, "descripcion": "App funcional con áreas de mejora en interfaz o experiencia de usuario. La mayoría de las funcionalidades están implementadas." },
+        { "nombre": "Bueno", "tipoPuntaje": "bandaPct", "pctMin": 60, "pctMax": 74, "descripcion": "App básica con funcionalidades limitadas o errores menores. Interfaz simple y flujo parcialmente completo." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "bandaPct", "pctMin": 45, "pctMax": 59, "descripcion": "App con errores significativos y funcionalidades incompletas. Interfaz deficiente o problemas importantes de navegación." },
+        { "nombre": "No logrado", "tipoPuntaje": "bandaPct", "pctMin": 0, "pctMax": 44, "descripcion": "App no desarrollada o no funcional." }
+      ]
+    },
+    {
+      "nombre": "Dockerización e integración con Docker Compose",
+      "descripcion": "El estudiante provee Dockerfile para el backend WebFlux y para el servicio CUDA/PyCUDA, y un docker-compose.yml que levanta ambos en una red común, comunicándose por nombre de servicio (no localhost), con credenciales por variables de entorno y .env.example. Se evidencia ejecución integrada del sistema.",
+      "puntajeMaximo": 4,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "bandaPct", "pctMin": 90, "pctMax": 100, "descripcion": "Integración completa de los servicios en Docker Compose funcional y documentado: Dockerfiles, red común, variables de entorno y comunicación correcta entre servicios. Se evidencia ejecución integrada." },
+        { "nombre": "Muy bueno", "tipoPuntaje": "bandaPct", "pctMin": 75, "pctMax": 89, "descripcion": "Integración adecuada en Docker Compose con pequeñas mejoras posibles en configuración, documentación o manejo de variables de entorno. Los servicios principales se ejecutan correctamente." },
+        { "nombre": "Bueno", "tipoPuntaje": "bandaPct", "pctMin": 60, "pctMax": 74, "descripcion": "Integración básica con errores menores en configuración de contenedores, red o comunicación. La ejecución requiere ajustes manuales." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "bandaPct", "pctMin": 45, "pctMax": 59, "descripcion": "Integración deficiente con errores importantes en construcción, ejecución, red o configuración. La comunicación entre servicios no es estable." },
+        { "nombre": "No logrado", "tipoPuntaje": "bandaPct", "pctMin": 0, "pctMax": 44, "descripcion": "No se realizó la integración con Docker Compose o los servicios no pueden ejecutarse en contenedores." }
+      ]
+    },
+    {
+      "nombre": "Presentación y demostración en red local",
+      "descripcion": "Demostración en vivo del proyecto con los servicios comunicándose en red local, evidenciando el flujo completo (autenticación, carga, procesamiento GPU, almacenamiento, publicación, likes, comentarios, historial) y explicación de arquitectura. CRITERIO NO EVALUABLE POR CONTENIDO: depende de una demostración presencial; el sistema no genera puntaje y lo deriva al juicio del docente.",
+      "puntajeMaximo": 3,
+      "evaluablePorContenido": false,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "bandaPct", "pctMin": 90, "pctMax": 100, "descripcion": "Demostración exitosa con los servicios comunicándose en red local y flujo completo evidenciado. Explicación clara de arquitectura, flujo de trabajo y resultados." },
+        { "nombre": "Muy bueno", "tipoPuntaje": "bandaPct", "pctMin": 75, "pctMax": 89, "descripcion": "Demostración funcional con detalles menores por mejorar en presentación, explicación o integración. El flujo principal funciona." },
+        { "nombre": "Bueno", "tipoPuntaje": "bandaPct", "pctMin": 60, "pctMax": 74, "descripcion": "Demostración básica con errores menores de integración o explicación incompleta de arquitectura, CUDA/PyCUDA, Supabase o Docker." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "bandaPct", "pctMin": 45, "pctMax": 59, "descripcion": "Demostración deficiente con fallos importantes en la integración en red local. Explicación limitada o flujo no evidenciado." },
+        { "nombre": "No logrado", "tipoPuntaje": "bandaPct", "pctMin": 0, "pctMax": 44, "descripcion": "No se realizó la demostración funcional del proyecto." }
+      ]
+    }
+  ]
+}

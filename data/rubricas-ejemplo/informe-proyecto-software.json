@@ -1,0 +1,69 @@
+{
+  "nombre": "Informe técnico de proyecto de software",
+  "materia": "Ingeniería de Software",
+  "descripcion": "Informe escrito que documenta un proyecto de software: definición del problema y requisitos, diseño de la arquitectura, justificación de las decisiones técnicas y fundamentación teórica. Entrega tipo documento (PDF o DOCX). Todos los criterios son evaluables a partir del texto del informe.",
+  "puntajeTotal": 20,
+  "modoTotal": "suma",
+  "criterios": [
+    {
+      "nombre": "Definición del problema y requisitos",
+      "descripcion": "El informe describe el problema que el software resuelve, su contexto y alcance, e identifica requisitos funcionales y no funcionales concretos y verificables. Para el nivel más alto, distingue requisitos funcionales de no funcionales y los redacta de forma comprobable (no ambigua).",
+      "puntajeMaximo": 4,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 4, "max": 4, "descripcion": "Problema, contexto y alcance claramente delimitados. Lista de requisitos funcionales y no funcionales concretos, verificables y bien diferenciados." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 3, "max": 3, "descripcion": "Problema y requisitos presentes y comprensibles, pero con alcance algo difuso o algún requisito ambiguo o sin clasificar." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 2, "max": 2, "descripcion": "Se menciona el problema y algunos requisitos, pero sin distinguir tipos o con requisitos vagos no comprobables." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 1, "descripcion": "No se define el problema o no se identifican requisitos, o los presentados no corresponden al proyecto." }
+      ]
+    },
+    {
+      "nombre": "Diseño de la arquitectura",
+      "descripcion": "El informe presenta la arquitectura del sistema: componentes principales, sus responsabilidades y cómo interactúan. Para el nivel más alto, incluye un diagrama y explica el flujo de datos o de control entre componentes, no solo una lista de tecnologías.",
+      "puntajeMaximo": 5,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 5, "max": 5, "descripcion": "Arquitectura completa: componentes con responsabilidades claras, diagrama, y explicación del flujo de datos/control entre ellos. Coherente con los requisitos." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 4, "max": 4, "descripcion": "Arquitectura comprensible con componentes y relaciones descritas, pero sin diagrama o con el flujo explicado parcialmente." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 2, "max": 3, "descripcion": "Se enumeran componentes o tecnologías sin explicar responsabilidades ni cómo interactúan." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 1, "descripcion": "No hay descripción de arquitectura o es incoherente con el problema planteado." }
+      ]
+    },
+    {
+      "nombre": "Justificación de decisiones técnicas",
+      "descripcion": "El informe argumenta por qué se eligieron las tecnologías, patrones o enfoques empleados, considerando alternativas y trade-offs. Para el nivel más alto, contrasta al menos una alternativa descartada y explica el motivo de la elección en términos del problema.",
+      "puntajeMaximo": 5,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 5, "max": 5, "descripcion": "Cada decisión técnica relevante está justificada en función del problema, considerando alternativas y trade-offs explícitos." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 4, "max": 4, "descripcion": "Las decisiones principales están justificadas, pero sin considerar alternativas o con trade-offs superficiales." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 2, "max": 3, "descripcion": "Se mencionan las tecnologías usadas pero la justificación es genérica ('es popular', 'la conozco') o ausente en decisiones clave." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 1, "descripcion": "No se justifican las decisiones técnicas." }
+      ]
+    },
+    {
+      "nombre": "Fundamentación teórica y referencias",
+      "descripcion": "El informe sustenta sus afirmaciones con referencias académicas o técnicas pertinentes citadas en formato APA, e integra cada fuente al argumento (no solo una lista de bibliografía). Para el nivel más alto, usa al menos 3 fuentes pertinentes integradas al texto.",
+      "puntajeMaximo": 3,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 3, "max": 3, "descripcion": "Al menos 3 fuentes pertinentes integradas al argumento y citadas correctamente en APA." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 2, "max": 2, "descripcion": "2 o 3 fuentes citadas, con integración parcial al argumento o formato APA con errores menores." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 1, "max": 1, "descripcion": "Menos de 2 fuentes, o fuentes listadas sin relación con el texto, o sin formato de cita." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 0, "descripcion": "No hay referencias ni fundamentación." }
+      ]
+    },
+    {
+      "nombre": "Claridad, estructura y ortografía",
+      "descripcion": "El informe está organizado con una estructura lógica (secciones, títulos), redacción clara y sin errores ortográficos o gramaticales que dificulten la lectura.",
+      "puntajeMaximo": 3,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 3, "max": 3, "descripcion": "Estructura clara y lógica, redacción fluida, ortografía impecable." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 2, "max": 2, "descripcion": "Estructura adecuada con redacción comprensible y errores ortográficos aislados." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 1, "max": 1, "descripcion": "Organización débil o redacción confusa en partes, o errores ortográficos frecuentes." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 0, "descripcion": "Texto desorganizado, difícil de seguir, con errores que impiden la comprensión." }
+      ]
+    }
+  ]
+}

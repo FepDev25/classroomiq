@@ -1,0 +1,105 @@
+{
+  "nombre": "Análisis exploratorio de datos y presentación de resultados",
+  "materia": "Machine Learning",
+  "descripcion": "Práctica de análisis exploratorio sobre un dataset: exploración inicial, resumen estadístico, visualización, análisis de categorías, correlaciones, outliers e hipótesis, comunicadas en una presentación. Entrega: cuaderno Jupyter (.ipynb) más presentación (.pdf o .pptx). El total es el promedio de los criterios (cada uno sobre 10).",
+  "puntajeTotal": 10,
+  "modoTotal": "promedio",
+  "criterios": [
+    {
+      "nombre": "Descripción del dataset",
+      "descripcion": "Describe el dataset: número de variables y observaciones, tipos de variables, calidad de los datos y la variable de estudio Y (objetivo).",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 9, "max": 10, "descripcion": "Descripción detallada y clara del dataset y de la variable de estudio Y." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 6, "max": 8, "descripcion": "Descripción adecuada del dataset y la variable de estudio." },
+        { "nombre": "Aceptable", "tipoPuntaje": "rango", "min": 3, "max": 5, "descripcion": "Presentación básica del dataset, pero incompleta." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "No se presentó información sobre el dataset." }
+      ]
+    },
+    {
+      "nombre": "Conclusiones del resumen estadístico",
+      "descripcion": "Calcula estadísticas descriptivas (media, desviación, percentiles) y deriva conclusiones sobre la variabilidad de los datos.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 9, "max": 10, "descripcion": "Conclusiones detalladas y profundas con justificación a partir del resumen estadístico." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 6, "max": 8, "descripcion": "Conclusiones claras y efectivas sobre el resumen estadístico." },
+        { "nombre": "Aceptable", "tipoPuntaje": "rango", "min": 3, "max": 5, "descripcion": "Conclusiones limitadas, con falta de profundidad." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "No se presentaron conclusiones del resumen estadístico." }
+      ]
+    },
+    {
+      "nombre": "Conclusiones de visualización",
+      "descripcion": "Crea visualizaciones pertinentes (histogramas, dispersión, cajas, etc.) y discute las figuras más relevantes y su impacto en el análisis.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 9, "max": 10, "descripcion": "Análisis exhaustivo de las visualizaciones y su impacto." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 6, "max": 8, "descripcion": "Análisis efectivo de las figuras relevantes." },
+        { "nombre": "Aceptable", "tipoPuntaje": "rango", "min": 3, "max": 5, "descripcion": "Discusión superficial de algunas visualizaciones." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "No se discutieron figuras relevantes." }
+      ]
+    },
+    {
+      "nombre": "Análisis de frecuencia de categorías",
+      "descripcion": "Analiza la distribución de las variables categóricas mediante análisis de frecuencia y deriva conclusiones.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 9, "max": 10, "descripcion": "Análisis completo y bien justificado de las categorías." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 6, "max": 8, "descripcion": "Análisis efectivo y comprensible de frecuencias." },
+        { "nombre": "Aceptable", "tipoPuntaje": "rango", "min": 3, "max": 5, "descripcion": "Análisis básico y poco profundo." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "No se presentó análisis de frecuencias." }
+      ]
+    },
+    {
+      "nombre": "Correlaciones con la variable Y",
+      "descripcion": "Identifica las variables más correlacionadas con la variable objetivo Y y deriva conclusiones e implicaciones.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 9, "max": 10, "descripcion": "Análisis profundo de las correlaciones y sus implicaciones." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 6, "max": 8, "descripcion": "Identificación clara de variables correlacionadas y conclusiones." },
+        { "nombre": "Aceptable", "tipoPuntaje": "rango", "min": 3, "max": 5, "descripcion": "Identificación básica, con falta de conclusiones." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "No se identificaron variables correlacionadas." }
+      ]
+    },
+    {
+      "nombre": "Análisis de outliers",
+      "descripcion": "Identifica valores atípicos, analiza su impacto y justifica si conviene o no eliminarlos.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 9, "max": 10, "descripcion": "Análisis completo y justificado sobre la eliminación de outliers." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 6, "max": 8, "descripcion": "Análisis efectivo de outliers y sus implicaciones." },
+        { "nombre": "Aceptable", "tipoPuntaje": "rango", "min": 3, "max": 5, "descripcion": "Identificación superficial de outliers." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "No se presentó análisis de outliers." }
+      ]
+    },
+    {
+      "nombre": "Hipótesis iniciales",
+      "descripcion": "Formula hipótesis iniciales basadas en el análisis, fundamentadas y con ejemplos.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 9, "max": 10, "descripcion": "Hipótesis sólidas y bien justificadas con ejemplos." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 6, "max": 8, "descripcion": "Hipótesis formuladas de manera efectiva." },
+        { "nombre": "Aceptable", "tipoPuntaje": "rango", "min": 3, "max": 5, "descripcion": "Hipótesis limitadas o sin base en el análisis." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "No se formularon hipótesis." }
+      ]
+    },
+    {
+      "nombre": "Comunicación y presentación",
+      "descripcion": "La presentación (.pdf o .pptx) comunica los hallazgos de forma clara, estructurada y convincente. Se evalúa sobre el contenido del archivo entregado, no sobre una exposición oral.",
+      "puntajeMaximo": 10,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 9, "max": 10, "descripcion": "Presentación excepcionalmente clara, estructurada y convincente." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 6, "max": 8, "descripcion": "Presentación clara y bien estructurada." },
+        { "nombre": "Aceptable", "tipoPuntaje": "rango", "min": 3, "max": 5, "descripcion": "Presentación aceptable pero con falta de claridad." },
+        { "nombre": "Insatisfactorio", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "Presentación desorganizada y difícil de seguir." }
+      ]
+    }
+  ]
+}
