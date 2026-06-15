@@ -10,6 +10,11 @@ spring:
     username: ${DB_USERNAME:classroomiq}
     password: ${DB_PASSWORD:classroomiq}
 
+  servlet:
+    multipart:
+      max-file-size: ${UPLOAD_MAX_FILE_SIZE:50MB}
+      max-request-size: ${UPLOAD_MAX_REQUEST_SIZE:200MB}
+
   jpa:
     open-in-view: false
     hibernate:
@@ -44,6 +49,11 @@ app:
   # Idempotente: solo siembra si la base está vacía. Desactivado en prod y en tests.
   seed:
     enabled: ${SEED_ENABLED:true}
+
+  # Almacenamiento local de los archivos de entregas (organizado por tenant/materia/lote/entrega).
+  # Datos sensibles: no salen del servidor ni se versionan
+  storage:
+    base-path: ${STORAGE_BASE_PATH:./var/entregas}
 
   embeddings:
     provider: ${EMBEDDINGS_PROVIDER:ollama}

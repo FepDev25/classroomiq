@@ -6,6 +6,10 @@ CLAUDE.md
 .env
 !.env.example
 
+# Almacenamiento local de archivos de entregas (datos sensibles, no se versionan)
+var/
+**/var/
+
 # backend
 HELP.md
 target/
