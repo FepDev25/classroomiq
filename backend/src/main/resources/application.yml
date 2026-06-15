@@ -55,6 +55,12 @@ app:
   storage:
     base-path: ${STORAGE_BASE_PATH:./var/entregas}
 
+  # Chunking del texto extraído antes de generar embeddings. Presupuesto en caracteres
+  # (~4 chars/token): 2000 ≈ 500 tokens, con 300 de solape (~15%).
+  chunking:
+    max-chars: ${CHUNK_MAX_CHARS:2000}
+    overlap-chars: ${CHUNK_OVERLAP_CHARS:300}
+
   embeddings:
     provider: ${EMBEDDINGS_PROVIDER:ollama}
     dimension: ${EMBEDDINGS_DIMENSION:1024}
