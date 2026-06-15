@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.classroomiq.backend.entrega.LoteService;
 import com.classroomiq.backend.entrega.dto.LoteRequest;
 import com.classroomiq.backend.entrega.dto.LoteResponse;
+import com.classroomiq.backend.entrega.dto.ProcesamientoResponse;
+import com.classroomiq.backend.entrega.procesamiento.ProcesamientoService;
 
 import jakarta.validation.Valid;
 
@@ -26,9 +28,11 @@ import jakarta.validation.Valid;
 public class LoteController {
 
     private final LoteService lotes;
+    private final ProcesamientoService procesamiento;
 
-    public LoteController(LoteService lotes) {
+    public LoteController(LoteService lotes, ProcesamientoService procesamiento) {
         this.lotes = lotes;
+        this.procesamiento = procesamiento;
     }
 
     @PostMapping
@@ -51,5 +55,11 @@ public class LoteController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable UUID id) {
         lotes.eliminar(id);
+    }
+
+    @PostMapping("/{id}/procesar")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ProcesamientoResponse procesar(@PathVariable UUID id) {
+        return new ProcesamientoResponse(procesamiento.iniciar(id));
     }
 }
