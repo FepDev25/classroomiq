@@ -20,5 +20,17 @@ services:
       timeout: 5s
       retries: 5
 
+  # Embeddings locales (bge-m3) como servicio opcional.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: classroomiq-ollama
+    profiles: ["ollama"]
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
 volumes:
   db_data:
+  ollama_data:

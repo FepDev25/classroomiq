@@ -65,6 +65,14 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 
+		<!-- SSE de estado de procesamiento en background (Fase 3, Hito 6): WebFlux junto a MVC.
+		     Con ambos starters en el classpath la app arranca como servlet (MVC) y el endpoint SSE
+		     usa Flux + Reactor Sinks. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
 		<!-- Extracción de texto de entregas (Fase 3): PDF (PDFBox) y DOCX (POI). -->
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
@@ -113,6 +121,11 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
