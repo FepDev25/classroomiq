@@ -1,0 +1,24 @@
+name: classroomiq
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: classroomiq-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-classroomiq}
+      POSTGRES_USER: ${POSTGRES_USER:-classroomiq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-classroomiq}
+    ports:
+      # host:contenedor — Postgres siempre escucha en 5432 dentro del contenedor.
+      - "${POSTGRES_PORT:-5436}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-classroomiq} -d ${POSTGRES_DB:-classroomiq}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
