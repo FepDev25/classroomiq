@@ -66,6 +66,21 @@ app:
     max-chars: ${CHUNK_MAX_CHARS:2000}
     overlap-chars: ${CHUNK_OVERLAP_CHARS:300}
 
+  # Motor de evaluación LLM . Proveedor intercambiable; por ahora Anthropic cloud.
+  # Estrategia de dos niveles: modelo potente para el análisis por criterio, económico para
+  # tareas simples (clasificación/extracción de fases posteriores).
+  llm:
+    provider: ${LLM_PROVIDER:anthropic}
+    modelo-potente: ${LLM_MODELO_POTENTE:claude-sonnet-4-6}
+    modelo-economico: ${LLM_MODELO_ECONOMICO:claude-haiku-4-5}
+    max-tokens: ${LLM_MAX_TOKENS:8000}
+    # Nivel de esfuerzo del tier potente (low|medium|high|max). No aplica al económico.
+    effort: ${LLM_EFFORT:high}
+    # Si es true, al arrancar se hace una llamada sonda al proveedor (fail-fast de API key).
+    verify-on-startup: ${LLM_VERIFY_ON_STARTUP:false}
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+
   embeddings:
     provider: ${EMBEDDINGS_PROVIDER:ollama}
     dimension: ${EMBEDDINGS_DIMENSION:1024}
