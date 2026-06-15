@@ -2,6 +2,11 @@ spring:
   application:
     name: classroomiq-backend
 
+  # WebFlux convive en el classpath para el SSE de procesamiento (Flux + Reactor Sinks), pero la
+  # app corre como servlet (MVC) para el resto de la API. Explícito para evitar ambigüedad.
+  main:
+    web-application-type: servlet
+
   config:
     import: "optional:file:.env[.properties],optional:file:../.env[.properties]"
 
