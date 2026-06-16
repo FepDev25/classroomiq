@@ -99,6 +99,13 @@ app:
       timeout: ${OLLAMA_TIMEOUT:PT30S}
       batch-size: ${OLLAMA_EMBED_BATCH:16}
 
+  # Detección de similitud entre entregas del mismo lote, umbral-default: "similitud alta"
+  # por defecto 0.75, si el docente no especifica; top-fragmentos: pares de fragmentos
+  # de mayor similitud que se guardan por par para la visualización lado a lado.
+  similitud:
+    umbral-default: ${SIMILITUD_UMBRAL_DEFAULT:0.75}
+    top-fragmentos: ${SIMILITUD_TOP_FRAGMENTOS:5}
+
 logging:
   level:
     org.flywaydb: info
