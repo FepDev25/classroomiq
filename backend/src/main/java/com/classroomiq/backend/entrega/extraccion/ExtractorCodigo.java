@@ -2,7 +2,6 @@ package com.classroomiq.backend.entrega.extraccion;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,7 +58,9 @@ class ExtractorCodigo implements ExtractorArchivo {
                     continue;
                 }
                 boolean notebook = LenguajeDetector.esNotebook(entrada.getName());
-                if (!notebook && !LenguajeDetector.esCodigo(entrada.getName())) {
+                boolean relevante = notebook || LenguajeDetector.esCodigo(entrada.getName())
+                        || LenguajeDetector.esTexto(entrada.getName());
+                if (!relevante) {
                     continue;
                 }
                 byte[] contenido = leerEntrada(zip, nombreLogico);
@@ -70,7 +71,7 @@ class ExtractorCodigo implements ExtractorArchivo {
                 if (notebook) {
                     segmentos.addAll(notebookParser.parsear(contenido, entrada.getName()));
                 } else {
-                    segmentos.add(segmentoCodigo(entrada.getName(), contenido));
+                    segmentos.add(segmentoArchivo(entrada.getName(), contenido));
                 }
             }
         } catch (IOException e) {
@@ -79,7 +80,11 @@ class ExtractorCodigo implements ExtractorArchivo {
         return segmentos;
     }
 
-    private SegmentoTexto segmentoCodigo(String nombre, byte[] contenido) {
+    /**
+     * Un segmento por archivo de código o de texto plano. Para los archivos de texto (README, .txt)
+     * el lenguaje queda nulo, por lo que el chunking posterior los trata como prosa, no como código.
+     */
+    private SegmentoTexto segmentoArchivo(String nombre, byte[] contenido) {
         String texto = new String(contenido, StandardCharsets.UTF_8);
         int lineas = (int) Math.max(1, texto.lines().count());
         return SegmentoTexto.de(nombre, null, LenguajeDetector.lenguaje(nombre).orElse(null),
