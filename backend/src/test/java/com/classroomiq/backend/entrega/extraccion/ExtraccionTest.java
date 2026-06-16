@@ -87,9 +87,14 @@ class ExtraccionTest {
         });
         // Notebook: 2 celdas.
         assertThat(segmentos).filteredOn(s -> s.origen().contains("analysis.ipynb")).hasSize(2);
-        // node_modules y README.md (no es código) ignorados.
+        // README.md se extrae como texto plano (prosa, sin lenguaje) para evaluar la documentación.
+        assertThat(segmentos).anySatisfy(s -> {
+            assertThat(s.origen()).contains("README.md");
+            assertThat(s.lenguaje()).isNull();
+            assertThat(s.contenido()).contains("# Proyecto");
+        });
+        // Dependencias en node_modules ignoradas.
         assertThat(segmentos).noneSatisfy(s -> assertThat(s.origen()).contains("node_modules"));
-        assertThat(segmentos).noneSatisfy(s -> assertThat(s.origen()).contains("README"));
     }
 
     @Test
