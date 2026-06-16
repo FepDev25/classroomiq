@@ -61,7 +61,7 @@ public class SimilitudSemanticaService {
                 UUID b = ordenadas.get(j);
                 double similitud = VectorOps.coseno(centroides.get(a), centroides.get(b));
                 List<MatchFragmento> top = topFragmentos(porEntrega.get(a), porEntrega.get(b));
-                pares.add(new ParCalculado(a, b, similitud, null, top));
+                pares.add(new ParCalculado(a, b, similitud, top));
             }
         }
         return pares;
