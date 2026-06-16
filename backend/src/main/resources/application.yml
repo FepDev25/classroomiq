@@ -66,6 +66,12 @@ app:
     max-chars: ${CHUNK_MAX_CHARS:2000}
     overlap-chars: ${CHUNK_OVERLAP_CHARS:300}
 
+  # Retrieval semántico por criterio (RAG): cuántos fragmentos relevantes de la entrega se
+  # recuperan por criterio para construir el prompt del LLM.
+  evaluacion:
+    retrieval:
+      top-k: ${EVAL_RETRIEVAL_TOPK:8}
+
   # Motor de evaluación LLM . Proveedor intercambiable; por ahora Anthropic cloud.
   # Estrategia de dos niveles: modelo potente para el análisis por criterio, económico para
   # tareas simples (clasificación/extracción de fases posteriores).
