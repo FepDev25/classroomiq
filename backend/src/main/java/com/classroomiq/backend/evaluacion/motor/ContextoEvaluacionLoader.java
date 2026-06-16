@@ -45,7 +45,9 @@ public class ContextoEvaluacionLoader {
     public ContextoEvaluacion cargar(UUID entregaId) {
         Entrega entrega = entregas.findById(entregaId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Entrega no encontrada"));
-        if (entrega.getEstado() != EstadoEntrega.LISTO) {
+        // Debe estar indexada (LISTO). EVALUANDO también es válido: es el estado transitorio que fija
+        // el worker de fondo justo antes de invocar el motor.
+        if (entrega.getEstado() != EstadoEntrega.LISTO && entrega.getEstado() != EstadoEntrega.EVALUANDO) {
             throw new ReglaNegocioException(
                     "La entrega debe estar indexada (estado LISTO) antes de evaluarse; está en "
                             + entrega.getEstado());
