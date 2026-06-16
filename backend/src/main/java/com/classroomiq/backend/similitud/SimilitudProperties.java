@@ -17,10 +17,13 @@ import jakarta.validation.constraints.Positive;
  *                      umbral ⇒ el par se marca para revisión manual.
  * @param topFragmentos cantidad de pares de fragmentos de mayor similitud que se guardan por par de
  *                      entregas para la visualización lado a lado.
+ * @param ngramaTextual tamaño del n-grama (palabras consecutivas) de la similitud textual. Más alto
+ *                      = más estricto (solo detecta copias literales largas); 4-6 es lo habitual.
  */
 @ConfigurationProperties(prefix = "app.similitud")
 @Validated
 public record SimilitudProperties(
         @DecimalMin("0.0") @DecimalMax("1.0") BigDecimal umbralDefault,
-        @Positive int topFragmentos) {
+        @Positive int topFragmentos,
+        @Positive int ngramaTextual) {
 }
