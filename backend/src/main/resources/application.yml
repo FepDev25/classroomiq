@@ -81,6 +81,8 @@ app:
     modelo-economico: ${LLM_MODELO_ECONOMICO:claude-haiku-4-5}
     max-tokens: ${LLM_MAX_TOKENS:8000}
     # Nivel de esfuerzo del tier potente (low|medium|high|max). No aplica al económico.
+    # high tras validar vs ground truth: medium bajó el acierto exacto (92%→89%) y ahorró solo ~$0.01
+    # (la salida/thinking domina el costo y casi no cambió con medium). No compensa; quedamos en high.
     effort: ${LLM_EFFORT:high}
     # Si es true, al arrancar se hace una llamada sonda al proveedor (fail-fast de API key).
     verify-on-startup: ${LLM_VERIFY_ON_STARTUP:false}
