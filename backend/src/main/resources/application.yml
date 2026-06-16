@@ -105,6 +105,8 @@ app:
   similitud:
     umbral-default: ${SIMILITUD_UMBRAL_DEFAULT:0.75}
     top-fragmentos: ${SIMILITUD_TOP_FRAGMENTOS:5}
+    # Tamaño del n-grama (palabras) de la similitud textual: más alto = más estricto.
+    ngrama-textual: ${SIMILITUD_NGRAMA_TEXTUAL:5}
 
 logging:
   level:
