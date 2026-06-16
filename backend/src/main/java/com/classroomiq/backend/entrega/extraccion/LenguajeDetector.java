@@ -2,6 +2,7 @@ package com.classroomiq.backend.entrega.extraccion;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Detección de lenguaje de código por extensión de archivo. El conjunto de extensiones conocidas
@@ -34,11 +35,21 @@ final class LenguajeDetector {
             Map.entry("sh", "Shell"),
             Map.entry("m", "MATLAB"));
 
+    /**
+     * Archivos de texto plano relevantes en una entrega de código (READMEs, documentación). No son
+     * un lenguaje de programación, pero su contenido se evalúa (ej. el criterio "Documentación").
+     */
+    private static final Set<String> EXTENSIONES_TEXTO = Set.of("md", "markdown", "txt", "rst");
+
     private LenguajeDetector() {
     }
 
     static boolean esCodigo(String nombreArchivo) {
         return POR_EXTENSION.containsKey(extension(nombreArchivo));
+    }
+
+    static boolean esTexto(String nombreArchivo) {
+        return EXTENSIONES_TEXTO.contains(extension(nombreArchivo));
     }
 
     static boolean esNotebook(String nombreArchivo) {
