@@ -1,5 +1,6 @@
 package com.classroomiq.backend.evaluacion.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +25,9 @@ public interface EvaluacionRepository extends JpaRepository<Evaluacion, UUID> {
     Optional<Evaluacion> findByIdAndDocenteId(UUID id, UUID docenteId);
 
     List<Evaluacion> findAllByDocenteId(UUID docenteId);
+
+    /** Evaluaciones de un conjunto de entregas (las de un lote), para el resumen por grupo (Fase 5). */
+    List<Evaluacion> findAllByEntregaIdIn(Collection<UUID> entregaIds);
 
     boolean existsByEntregaId(UUID entregaId);
 
