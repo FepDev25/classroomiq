@@ -15,6 +15,7 @@ import com.classroomiq.backend.evaluacion.domain.Evaluacion;
 import com.classroomiq.backend.evaluacion.domain.EvaluacionCriterio;
 import com.classroomiq.backend.evaluacion.repository.EvaluacionRepository;
 import com.classroomiq.backend.evaluacion.retrieval.RetrievalCriterioService;
+import com.classroomiq.backend.metricas.RegistroUsoService;
 import com.classroomiq.backend.rubrica.domain.Criterio;
 import com.classroomiq.backend.rubrica.domain.ModoTotal;
 import com.classroomiq.backend.rubrica.domain.NivelDesempeno;
@@ -50,10 +51,12 @@ public class MotorEvaluacion {
     private final PromptEvaluacion prompt;
     private final RespuestaEvaluacionParser parser;
     private final EvaluacionRepository evaluaciones;
+    private final RegistroUsoService registroUso;
 
     public MotorEvaluacion(ContextoEvaluacionLoader contextoLoader, RetrievalCriterioService retrieval,
             FragmentoEntregaRepository fragmentos, LlmProvider llm, PromptEvaluacion prompt,
-            RespuestaEvaluacionParser parser, EvaluacionRepository evaluaciones) {
+            RespuestaEvaluacionParser parser, EvaluacionRepository evaluaciones,
+            RegistroUsoService registroUso) {
         this.contextoLoader = contextoLoader;
         this.retrieval = retrieval;
         this.fragmentos = fragmentos;
@@ -61,6 +64,7 @@ public class MotorEvaluacion {
         this.prompt = prompt;
         this.parser = parser;
         this.evaluaciones = evaluaciones;
+        this.registroUso = registroUso;
     }
 
     /**
@@ -82,14 +86,15 @@ public class MotorEvaluacion {
         eval.setRubricaId(ctx.rubricaId());
 
         for (Criterio criterio : ctx.criterios()) {
-            eval.addCriterio(evaluarCriterio(entregaId, criterio, hayContenido));
+            eval.addCriterio(evaluarCriterio(ctx.docenteId(), entregaId, criterio, hayContenido));
         }
 
         eval.setPuntajeTotalSugerido(calcularTotal(ctx.modoTotal(), eval.getCriterios()));
         return evaluaciones.save(eval);
     }
 
-    private EvaluacionCriterio evaluarCriterio(UUID entregaId, Criterio criterio, boolean hayContenido) {
+    private EvaluacionCriterio evaluarCriterio(UUID docenteId, UUID entregaId, Criterio criterio,
+            boolean hayContenido) {
         EvaluacionCriterio ec = new EvaluacionCriterio();
         ec.setCriterioId(criterio.getId());
         ec.setOrden(criterio.getOrden());
@@ -109,6 +114,7 @@ public class MotorEvaluacion {
         List<FragmentoSimilar> relevantes = retrieval.recuperarParaCriterio(entregaId, criterio);
         LlmResultado resultado = llm.generar(new LlmSolicitud(
                 ModeloTier.POTENTE, prompt.system(), prompt.usuario(criterio, relevantes)));
+        registroUso.registrarEvaluacion(docenteId, entregaId, ModeloTier.POTENTE, resultado);
         EvaluacionLlmRespuesta respuesta = parser.parsear(resultado.texto());
         aplicarRespuesta(ec, criterio, respuesta, relevantes);
         return ec;
