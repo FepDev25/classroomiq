@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.classroomiq.backend.common.error.ReglaNegocioException;
 import com.classroomiq.backend.entrega.LoteService;
 import com.classroomiq.backend.entrega.domain.Lote;
+import com.classroomiq.backend.metricas.RegistroUsoService;
 import com.classroomiq.backend.provider.llm.LlmProvider;
 import com.classroomiq.backend.provider.llm.LlmResultado;
 import com.classroomiq.backend.provider.llm.LlmSolicitud;
@@ -35,14 +36,17 @@ public class NarrativaGrupoService {
     private final LlmProvider llm;
     private final PromptNarrativa prompt;
     private final ResumenGrupoRepository narrativas;
+    private final RegistroUsoService registroUso;
 
     public NarrativaGrupoService(ResumenGrupoService resumenService, LoteService loteService,
-            LlmProvider llm, PromptNarrativa prompt, ResumenGrupoRepository narrativas) {
+            LlmProvider llm, PromptNarrativa prompt, ResumenGrupoRepository narrativas,
+            RegistroUsoService registroUso) {
         this.resumenService = resumenService;
         this.loteService = loteService;
         this.llm = llm;
         this.prompt = prompt;
         this.narrativas = narrativas;
+        this.registroUso = registroUso;
     }
 
     /**
@@ -56,6 +60,7 @@ public class NarrativaGrupoService {
 
         LlmResultado resultado = llm.generar(new LlmSolicitud(
                 ModeloTier.ECONOMICO, prompt.system(), prompt.usuario(resumen)));
+        registroUso.registrarNarrativa(lote.getDocenteId(), loteId, ModeloTier.ECONOMICO, resultado);
         String texto = resultado.texto() == null ? "" : resultado.texto().strip();
         if (texto.isBlank()) {
             throw new ReglaNegocioException("El modelo no devolvió narrativa para el resumen");
