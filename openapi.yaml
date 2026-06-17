@@ -1,0 +1,1387 @@
+openapi: 3.1.0
+info:
+  title: classroomiq — API
+  version: "0.0.1"
+  license:
+    name: Propietario
+  description: |
+    Contrato de la API del backend de **classroomiq**, plataforma de asistencia a evaluación docente
+    universitaria. Fuente de verdad para el frontend.
+
+    **Principio inamovible:** el docente es el juez; el sistema nunca asigna la nota final, genera
+    borradores que el docente revisa, ajusta y aprueba.
+
+    ## Autenticación
+    Todas las rutas excepto `POST /api/auth/login` y `/actuator/health` exigen un **JWT Bearer**
+    obtenido en el login. El token porta `sub` (usuarioId), `tenant_id`, `rol` y `email`. La
+    autorización es por rol (`ADMIN`, `DOCENTE`, `COORDINADOR`).
+
+    ## Aislamiento
+    Multi-tenant: cada institución (tenant) y cada docente operan aislados. Un recurso de otro
+    tenant/docente responde `404` (no se distingue de "no existe", para no filtrar existencia).
+
+    ## Errores
+    Respuestas de error en formato **RFC 7807 `application/problem+json`** (`ProblemDetail`). En
+    validación de cuerpo (`400`) se agregan propiedades por campo con el mensaje de error.
+servers:
+  - url: http://localhost:8080
+    description: Desarrollo local
+
+tags:
+  - name: Auth
+    description: Login y emisión de JWT.
+  - name: Admin · Usuarios
+    description: Gestión de cuentas (rol ADMIN).
+  - name: Admin · Coordinadores
+    description: Asignación de materias a coordinadores (rol ADMIN).
+  - name: Admin · Métricas
+    description: Uso y costo estimado del LLM (rol ADMIN).
+  - name: Materias
+    description: CRUD de materias del docente (rol DOCENTE).
+  - name: Rúbricas
+    description: CRUD de rúbricas anidadas en materias (rol DOCENTE).
+  - name: Lotes y entregas
+    description: Lotes, subida y procesamiento de entregas, SSE de estado (rol DOCENTE).
+  - name: Evaluación
+    description: Disparo de la evaluación LLM en background (rol DOCENTE).
+  - name: Revisión
+    description: Lectura, edición y aprobación del borrador de evaluación (rol DOCENTE).
+  - name: Similitud
+    description: Detección de similitud dentro de un lote (rol DOCENTE).
+  - name: Reportes
+    description: Resumen por grupo y narrativa LLM (rol DOCENTE).
+  - name: Coordinador
+    description: Acceso de solo lectura a reportes agregados de materias asignadas (rol COORDINADOR).
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ------------------------------------------------------------------ Auth
+  /api/auth/login:
+    post:
+      operationId: postAuthLogin
+      tags: [Auth]
+      summary: Iniciar sesión
+      description: Valida credenciales y devuelve un JWT de acceso. Ruta pública.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginRequest" }
+      responses:
+        "200":
+          description: Token emitido.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  # ------------------------------------------------------- Admin · Usuarios
+  /api/admin/usuarios:
+    post:
+      operationId: postAdminUsuarios
+      tags: [Admin · Usuarios]
+      summary: Crear cuenta
+      description: Crea un docente o coordinador. No se permite crear ADMIN por esta vía.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateUsuarioRequest" }
+      responses:
+        "201":
+          description: Cuenta creada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UsuarioResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    get:
+      operationId: getAdminUsuarios
+      tags: [Admin · Usuarios]
+      summary: Listar cuentas de la institución
+      responses:
+        "200":
+          description: Lista de usuarios.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/UsuarioResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /api/admin/usuarios/{id}/activar:
+    post:
+      operationId: postAdminUsuariosByIdActivar
+      tags: [Admin · Usuarios]
+      summary: Activar cuenta
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Cuenta activada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UsuarioResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/admin/usuarios/{id}/desactivar:
+    post:
+      operationId: postAdminUsuariosByIdDesactivar
+      tags: [Admin · Usuarios]
+      summary: Desactivar cuenta
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Cuenta desactivada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UsuarioResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # -------------------------------------------------- Admin · Coordinadores
+  /api/admin/coordinadores/{coordinadorId}/materias:
+    get:
+      operationId: getAdminCoordinadoresByCoordinadorIdMaterias
+      tags: [Admin · Coordinadores]
+      summary: Listar materias asignadas a un coordinador
+      parameters: [{ $ref: "#/components/parameters/CoordinadorId" }]
+      responses:
+        "200":
+          description: Materias asignadas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MateriaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /api/admin/coordinadores/{coordinadorId}/materias/{materiaId}:
+    post:
+      operationId: postAdminCoordinadoresByCoordinadorIdMateriasByMateriaId
+      tags: [Admin · Coordinadores]
+      summary: Asignar una materia a un coordinador
+      description: El usuario destino debe tener rol COORDINADOR (si no, `422`).
+      parameters:
+        - { $ref: "#/components/parameters/CoordinadorId" }
+        - { $ref: "#/components/parameters/MateriaId" }
+      responses:
+        "200":
+          description: Materias asignadas tras la operación.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MateriaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    delete:
+      operationId: deleteAdminCoordinadoresByCoordinadorIdMateriasByMateriaId
+      tags: [Admin · Coordinadores]
+      summary: Desasignar una materia de un coordinador
+      parameters:
+        - { $ref: "#/components/parameters/CoordinadorId" }
+        - { $ref: "#/components/parameters/MateriaId" }
+      responses:
+        "200":
+          description: Materias asignadas tras la operación.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MateriaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  # ------------------------------------------------------ Admin · Métricas
+  /api/admin/metricas/uso:
+    get:
+      operationId: getAdminMetricasUso
+      tags: [Admin · Métricas]
+      summary: Resumen de uso/costo de la institución
+      description: Uso y costo estimado por docente + total institucional + bandera de umbral.
+      parameters: [{ $ref: "#/components/parameters/Mes" }]
+      responses:
+        "200":
+          description: Métricas del mes.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MetricasUsoResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+  /api/admin/metricas/uso/{docenteId}:
+    get:
+      operationId: getAdminMetricasUsoByDocenteId
+      tags: [Admin · Métricas]
+      summary: Detalle de uso/costo de un docente
+      description: Desglose por modelo y por operación (evaluación vs narrativa).
+      parameters:
+        - name: docenteId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - { $ref: "#/components/parameters/Mes" }
+      responses:
+        "200":
+          description: Detalle del docente.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DocenteUsoDetalleResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+
+  # --------------------------------------------------------------- Materias
+  /api/materias:
+    post:
+      operationId: postMaterias
+      tags: [Materias]
+      summary: Crear materia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MateriaRequest" }
+      responses:
+        "201":
+          description: Materia creada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MateriaResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    get:
+      operationId: getMaterias
+      tags: [Materias]
+      summary: Listar materias del docente
+      responses:
+        "200":
+          description: Materias.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MateriaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /api/materias/{id}:
+    get:
+      operationId: getMateriasById
+      tags: [Materias]
+      summary: Obtener materia
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Materia.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MateriaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      operationId: putMateriasById
+      tags: [Materias]
+      summary: Actualizar materia
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MateriaRequest" }
+      responses:
+        "200":
+          description: Materia actualizada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MateriaResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/materias/{id}/archivar:
+    post:
+      operationId: postMateriasByIdArchivar
+      tags: [Materias]
+      summary: Archivar materia
+      description: Conserva los datos para histórico pero la saca de la vista activa.
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Materia archivada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MateriaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # --------------------------------------------------------------- Rúbricas
+  /api/materias/{materiaId}/rubricas:
+    post:
+      operationId: postMateriasByMateriaIdRubricas
+      tags: [Rúbricas]
+      summary: Crear rúbrica en una materia
+      description: |
+        Valida coherencia de puntajes (según `modoTotal`: suma==total, o cada criterio==total en
+        promedio), mínimo 2 niveles por criterio y niveles dentro de rango → `422` si incoherente.
+      parameters: [{ $ref: "#/components/parameters/MateriaIdPath" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RubricaRequest" }
+      responses:
+        "201":
+          description: Rúbrica creada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RubricaResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    get:
+      operationId: getMateriasByMateriaIdRubricas
+      tags: [Rúbricas]
+      summary: Listar rúbricas de una materia
+      parameters: [{ $ref: "#/components/parameters/MateriaIdPath" }]
+      responses:
+        "200":
+          description: Rúbricas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/RubricaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/rubricas/{id}:
+    get:
+      operationId: getRubricasById
+      tags: [Rúbricas]
+      summary: Obtener rúbrica
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Rúbrica.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RubricaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      operationId: putRubricasById
+      tags: [Rúbricas]
+      summary: Actualizar rúbrica
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RubricaRequest" }
+      responses:
+        "200":
+          description: Rúbrica actualizada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RubricaResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    delete:
+      operationId: deleteRubricasById
+      tags: [Rúbricas]
+      summary: Eliminar rúbrica
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "204": { description: Eliminada. }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # -------------------------------------------------------- Lotes y entregas
+  /api/lotes:
+    post:
+      operationId: postLotes
+      tags: [Lotes y entregas]
+      summary: Crear lote
+      description: Asocia el lote a una materia y una rúbrica propias (la rúbrica debe ser de la materia).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoteRequest" }
+      responses:
+        "201":
+          description: Lote creado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LoteResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    get:
+      operationId: getLotes
+      tags: [Lotes y entregas]
+      summary: Listar lotes del docente
+      responses:
+        "200":
+          description: Lotes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/LoteResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /api/lotes/{id}:
+    get:
+      operationId: getLotesById
+      tags: [Lotes y entregas]
+      summary: Obtener lote
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Lote.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LoteResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      operationId: deleteLotesById
+      tags: [Lotes y entregas]
+      summary: Eliminar lote
+      description: Borra el lote, sus entregas y los archivos en disco.
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "204": { description: Eliminado. }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/lotes/{loteId}/entregas:
+    post:
+      operationId: postLotesByLoteIdEntregas
+      tags: [Lotes y entregas]
+      summary: Subir una entrega (multipart)
+      description: |
+        Sube los archivos de un estudiante. La clasificación valida coherencia con `tipo`
+        (pdf/docx → DOCUMENTO, zip → CODIGO, ambos → MIXTA). La entrega queda en estado `PENDIENTE`.
+      parameters: [{ $ref: "#/components/parameters/LoteId" }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [identificadorEstudiante, tipo, archivos]
+              properties:
+                identificadorEstudiante:
+                  type: string
+                  description: Identificador o alias del estudiante/grupo (no requiere datos personales).
+                tipo: { $ref: "#/components/schemas/TipoEntrega" }
+                archivos:
+                  type: array
+                  items: { type: string, format: binary }
+      responses:
+        "201":
+          description: Entrega creada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EntregaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "413": { $ref: "#/components/responses/PayloadTooLarge" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    get:
+      operationId: getLotesByLoteIdEntregas
+      tags: [Lotes y entregas]
+      summary: Listar entregas de un lote
+      parameters: [{ $ref: "#/components/parameters/LoteId" }]
+      responses:
+        "200":
+          description: Entregas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/EntregaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/entregas/{id}:
+    get:
+      operationId: getEntregasById
+      tags: [Lotes y entregas]
+      summary: Obtener entrega
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Entrega.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EntregaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      operationId: deleteEntregasById
+      tags: [Lotes y entregas]
+      summary: Eliminar entrega
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "204": { description: Eliminada. }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/lotes/{id}/procesar:
+    post:
+      operationId: postLotesByIdProcesar
+      tags: [Lotes y entregas]
+      summary: Procesar el lote (indexado en background)
+      description: |
+        Encola el procesamiento (extracción → chunking → embeddings → pgvector) de las entregas
+        pendientes/erróneas. Responde de inmediato (`202`); el progreso se sigue por SSE.
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "202":
+          description: Procesamiento encolado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProcesamientoResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/lotes/{id}/eventos:
+    get:
+      operationId: getLotesByIdEventos
+      tags: [Lotes y entregas]
+      summary: Stream SSE de estado de entregas
+      description: |
+        Server-Sent Events con el estado por entrega del lote en tiempo real (procesamiento y
+        evaluación). Cada evento `data` es un `EntregaEventoResponse`. Incluye keep-alive.
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Stream de eventos.
+          content:
+            text/event-stream:
+              schema: { $ref: "#/components/schemas/EntregaEventoResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ------------------------------------------------------------- Evaluación
+  /api/lotes/{id}/evaluar:
+    post:
+      operationId: postLotesByIdEvaluar
+      tags: [Evaluación]
+      summary: Evaluar el lote (borradores LLM en background)
+      description: |
+        Encola la evaluación LLM por criterio de las entregas ya indexadas (estado `LISTO`).
+        Responde `202`; el progreso (EVALUANDO→LISTO) se sigue por el mismo SSE del lote.
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "202":
+          description: Evaluación encolada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EvaluacionLoteResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # -------------------------------------------------------------- Revisión
+  /api/entregas/{entregaId}/evaluacion:
+    get:
+      operationId: getEntregasByEntregaIdEvaluacion
+      tags: [Revisión]
+      summary: Obtener el borrador de evaluación de una entrega
+      description: Borrador enriquecido con la rúbrica (criterios, niveles disponibles con rango, citas).
+      parameters:
+        - name: entregaId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Borrador.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BorradorResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/evaluaciones/{evaluacionId}/criterios/{criterioId}:
+    patch:
+      operationId: patchEvaluacionesByEvaluacionIdCriteriosByCriterioId
+      tags: [Revisión]
+      summary: Editar un criterio del borrador
+      description: |
+        Ajusta nivel/puntaje/justificación o marca el criterio como revisado. Valida que el puntaje
+        caiga en el rango del nivel (o en `0..puntajeMaximo` sin nivel) → `422`. Editar una
+        evaluación ya `APROBADA` → `409`.
+      parameters:
+        - name: evaluacionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: criterioId
+          in: path
+          required: true
+          description: Id de la fila `evaluacion_criterio` (no el id del criterio de la rúbrica).
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CriterioRevisionRequest" }
+      responses:
+        "200":
+          description: Borrador actualizado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BorradorResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+  /api/evaluaciones/{evaluacionId}/comentario:
+    patch:
+      operationId: patchEvaluacionesByEvaluacionIdComentario
+      tags: [Revisión]
+      summary: Editar el comentario general
+      parameters:
+        - name: evaluacionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ComentarioRequest" }
+      responses:
+        "200":
+          description: Borrador actualizado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BorradorResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /api/evaluaciones/{evaluacionId}/aprobar:
+    post:
+      operationId: postEvaluacionesByEvaluacionIdAprobar
+      tags: [Revisión]
+      summary: Aprobar la evaluación
+      description: Recalcula el puntaje total final por `modoTotal` y congela la evaluación (`APROBADA`).
+      parameters:
+        - name: evaluacionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Evaluación aprobada.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BorradorResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  # -------------------------------------------------------------- Similitud
+  /api/lotes/{id}/similitud:
+    post:
+      operationId: postLotesByIdSimilitud
+      tags: [Similitud]
+      summary: Generar el reporte de similitud del lote
+      description: |
+        Calcula similitud semántica (pgvector) y textual (n-gramas) entre pares del lote.
+        Requiere ≥ 2 entregas en estado `LISTO` (si no, `422`). Idempotente (regenera).
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/GenerarSimilitudRequest" }
+      responses:
+        "200":
+          description: Reporte generado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReporteSimilitudResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+    get:
+      operationId: getLotesByIdSimilitud
+      tags: [Similitud]
+      summary: Obtener el reporte de similitud del lote
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Reporte.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReporteSimilitudResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # --------------------------------------------------------------- Reportes
+  /api/lotes/{id}/resumen:
+    get:
+      operationId: getLotesByIdResumen
+      tags: [Reportes]
+      summary: Resumen por grupo del lote
+      description: |
+        Estadísticas agregadas sobre las evaluaciones aprobadas (histograma, por-criterio con mapa de
+        dominio, criterios difíciles) + narrativa LLM si ya fue generada. Requiere el lote completo
+        (todas las entregas aprobadas) → `422` si no.
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Resumen.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ResumenGrupoResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+  /api/lotes/{id}/resumen/narrativa:
+    post:
+      operationId: postLotesByIdResumenNarrativa
+      tags: [Reportes]
+      summary: Generar la narrativa del resumen
+      description: Genera (o regenera) el texto narrativo del resumen con el LLM económico y lo persiste.
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Resumen con narrativa incluida.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ResumenGrupoResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+
+  # ------------------------------------------------------------ Coordinador
+  /api/coordinador/materias:
+    get:
+      operationId: getCoordinadorMaterias
+      tags: [Coordinador]
+      summary: Materias asignadas al coordinador
+      responses:
+        "200":
+          description: Materias.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MateriaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /api/coordinador/materias/{materiaId}/lotes:
+    get:
+      operationId: getCoordinadorMateriasByMateriaIdLotes
+      tags: [Coordinador]
+      summary: Lotes de una materia asignada
+      parameters: [{ $ref: "#/components/parameters/MateriaId" }]
+      responses:
+        "200":
+          description: Lotes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/LoteResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/coordinador/lotes/{loteId}/resumen:
+    get:
+      operationId: getCoordinadorLotesByLoteIdResumen
+      tags: [Coordinador]
+      summary: Resumen por grupo de un lote de materia asignada
+      description: Solo agregados + narrativa; nunca evaluaciones individuales, trabajos ni similitud.
+      parameters: [{ $ref: "#/components/parameters/LoteId" }]
+      responses:
+        "200":
+          description: Resumen.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ResumenGrupoResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/UnprocessableEntity" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PathId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    CoordinadorId:
+      name: coordinadorId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    MateriaId:
+      name: materiaId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    MateriaIdPath:
+      name: materiaId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    LoteId:
+      name: loteId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Mes:
+      name: mes
+      in: query
+      required: false
+      description: Mes en formato `YYYY-MM`. Si se omite, el mes actual (UTC).
+      schema: { type: string, pattern: '^\d{4}-\d{2}$', example: "2026-06" }
+
+  responses:
+    BadRequest:
+      description: Cuerpo inválido (validación). Incluye una propiedad por campo con su error.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetail" }
+    Unauthorized:
+      description: Falta el token o es inválido.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetail" }
+    Forbidden:
+      description: El rol no tiene permiso para la operación.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetail" }
+    NotFound:
+      description: Recurso inexistente o de otro tenant/docente.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetail" }
+    Conflict:
+      description: Conflicto con el estado actual (p. ej. editar una evaluación aprobada).
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetail" }
+    UnprocessableEntity:
+      description: Regla de negocio violada (datos coherentes en forma pero inválidos en dominio).
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetail" }
+    PayloadTooLarge:
+      description: La subida supera el límite configurado.
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/ProblemDetail" }
+
+  schemas:
+    # ---- Enums
+    Rol:
+      type: string
+      enum: [ADMIN, DOCENTE, COORDINADOR]
+    TipoEntrega:
+      type: string
+      enum: [DOCUMENTO, CODIGO, MIXTA]
+    EstadoEntrega:
+      type: string
+      enum: [PENDIENTE, PROCESANDO, EVALUANDO, LISTO, ERROR]
+    EstadoLote:
+      type: string
+      enum: [ABIERTO, PROCESANDO, LISTO]
+    RolArchivo:
+      type: string
+      enum: [DOCUMENTO, CODIGO]
+    EstadoEvaluacion:
+      type: string
+      enum: [BORRADOR, APROBADA]
+    TipoPuntaje:
+      type: string
+      description: Forma del puntaje de un nivel. RANGO usa min/max; FIJO usa puntajeValor; BANDA_PCT usa pctMin/pctMax sobre el puntaje máximo del criterio.
+      enum: [RANGO, FIJO, BANDA_PCT]
+    ModoTotal:
+      type: string
+      description: Cómo se calcula el total de la rúbrica a partir de los criterios.
+      enum: [SUMA, PROMEDIO]
+    OperacionLlm:
+      type: string
+      enum: [EVALUACION, NARRATIVA]
+    TipoSimilitud:
+      type: string
+      enum: [SEMANTICA, TEXTUAL]
+
+    # ---- Error (RFC 7807)
+    ProblemDetail:
+      type: object
+      description: |
+        RFC 7807. En errores de validación (`400`) se agregan propiedades dinámicas, una por campo
+        inválido, con el mensaje como valor.
+      properties:
+        type: { type: string, format: uri, default: "about:blank" }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string, format: uri }
+      additionalProperties: true
+
+    # ---- Auth / Usuario
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+    TokenResponse:
+      type: object
+      properties:
+        accessToken: { type: string }
+        tokenType: { type: string, example: "Bearer" }
+        expiresIn: { type: integer, format: int64, description: Vigencia del token en segundos. }
+        usuarioId: { type: string, format: uuid }
+        rol: { $ref: "#/components/schemas/Rol" }
+    CreateUsuarioRequest:
+      type: object
+      required: [email, nombre, password, rol]
+      properties:
+        email: { type: string, format: email }
+        nombre: { type: string }
+        password: { type: string, minLength: 8 }
+        rol: { $ref: "#/components/schemas/Rol", description: "DOCENTE o COORDINADOR (no ADMIN)." }
+    UsuarioResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        nombre: { type: string }
+        rol: { $ref: "#/components/schemas/Rol" }
+        activo: { type: boolean }
+        ultimoAcceso: { type: [string, "null"], format: date-time }
+
+    # ---- Materia
+    MateriaRequest:
+      type: object
+      required: [nombre]
+      properties:
+        nombre: { type: string }
+        periodoAcademico: { type: [string, "null"], maxLength: 100 }
+        descripcion: { type: [string, "null"], maxLength: 4000 }
+    MateriaResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nombre: { type: string }
+        periodoAcademico: { type: [string, "null"] }
+        descripcion: { type: [string, "null"] }
+        archivada: { type: boolean }
+
+    # ---- Rúbrica
+    RubricaRequest:
+      type: object
+      required: [nombre, puntajeTotal, modoTotal, criterios]
+      properties:
+        nombre: { type: string }
+        descripcion: { type: [string, "null"] }
+        puntajeTotal: { type: number, description: "> 0" }
+        modoTotal: { $ref: "#/components/schemas/ModoTotal" }
+        criterios:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/CriterioRequest" }
+    CriterioRequest:
+      type: object
+      required: [nombre, puntajeMaximo, niveles]
+      properties:
+        nombre: { type: string }
+        descripcion: { type: [string, "null"] }
+        puntajeMaximo: { type: number, description: "> 0" }
+        evaluablePorContenido:
+          type: [boolean, "null"]
+          description: Si es false, el criterio requiere juicio del docente (no lo evalúa el LLM). Default true.
+        niveles:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/NivelRequest" }
+    NivelRequest:
+      type: object
+      required: [nombre, tipoPuntaje]
+      properties:
+        nombre: { type: string }
+        descripcion: { type: [string, "null"] }
+        tipoPuntaje: { $ref: "#/components/schemas/TipoPuntaje" }
+        puntajeMin: { type: [number, "null"], description: "Para tipoPuntaje RANGO." }
+        puntajeMax: { type: [number, "null"], description: "Para tipoPuntaje RANGO." }
+        puntajeValor: { type: [number, "null"], description: "Para tipoPuntaje FIJO." }
+        pctMin: { type: [number, "null"], description: "Para tipoPuntaje BANDA_PCT (0..1)." }
+        pctMax: { type: [number, "null"], description: "Para tipoPuntaje BANDA_PCT (0..1)." }
+    RubricaResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        materiaId: { type: string, format: uuid }
+        nombre: { type: string }
+        descripcion: { type: [string, "null"] }
+        puntajeTotal: { type: number }
+        modoTotal: { $ref: "#/components/schemas/ModoTotal" }
+        criterios:
+          type: array
+          items: { $ref: "#/components/schemas/CriterioResponse" }
+    CriterioResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nombre: { type: string }
+        descripcion: { type: [string, "null"] }
+        puntajeMaximo: { type: number }
+        evaluablePorContenido: { type: boolean }
+        orden: { type: integer }
+        niveles:
+          type: array
+          items: { $ref: "#/components/schemas/NivelResponse" }
+    NivelResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nombre: { type: string }
+        descripcion: { type: [string, "null"] }
+        tipoPuntaje: { $ref: "#/components/schemas/TipoPuntaje" }
+        puntajeMin: { type: [number, "null"] }
+        puntajeMax: { type: [number, "null"] }
+        puntajeValor: { type: [number, "null"] }
+        pctMin: { type: [number, "null"] }
+        pctMax: { type: [number, "null"] }
+        orden: { type: integer }
+
+    # ---- Lote / Entrega
+    LoteRequest:
+      type: object
+      required: [materiaId, rubricaId, nombre]
+      properties:
+        materiaId: { type: string, format: uuid }
+        rubricaId: { type: string, format: uuid }
+        nombre: { type: string, maxLength: 255 }
+    LoteResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        materiaId: { type: string, format: uuid }
+        rubricaId: { type: string, format: uuid }
+        nombre: { type: string }
+        estado: { $ref: "#/components/schemas/EstadoLote" }
+    EntregaResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        loteId: { type: string, format: uuid }
+        identificadorEstudiante: { type: string }
+        tipo: { $ref: "#/components/schemas/TipoEntrega" }
+        estado: { $ref: "#/components/schemas/EstadoEntrega" }
+        mensajeError: { type: [string, "null"], description: "Descripción del fallo si estado = ERROR." }
+        archivos:
+          type: array
+          items: { $ref: "#/components/schemas/ArchivoResponse" }
+    ArchivoResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nombreOriginal: { type: string }
+        mimeType: { type: string }
+        tamanoBytes: { type: integer, format: int64 }
+        rol: { $ref: "#/components/schemas/RolArchivo" }
+        orden: { type: integer }
+    ProcesamientoResponse:
+      type: object
+      properties:
+        entregasEncoladas: { type: integer }
+    EntregaEventoResponse:
+      type: object
+      description: Payload `data` de cada evento SSE.
+      properties:
+        entregaId: { type: string, format: uuid }
+        estado: { $ref: "#/components/schemas/EstadoEntrega" }
+
+    # ---- Evaluación / Revisión
+    EvaluacionLoteResponse:
+      type: object
+      properties:
+        entregasEncoladas: { type: integer }
+    BorradorResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        entregaId: { type: string, format: uuid }
+        rubricaId: { type: string, format: uuid }
+        estado: { $ref: "#/components/schemas/EstadoEvaluacion" }
+        puntajeTotalSugerido: { type: [number, "null"] }
+        puntajeTotalFinal: { type: [number, "null"] }
+        comentarioGeneral: { type: [string, "null"] }
+        aprobadaAt: { type: [string, "null"], format: date-time }
+        criterios:
+          type: array
+          items: { $ref: "#/components/schemas/CriterioEvaluadoResponse" }
+    CriterioEvaluadoResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid, description: "Id de la fila evaluacion_criterio (úsalo para editar)." }
+        criterioId: { type: string, format: uuid }
+        nombreCriterio: { type: string }
+        descripcionCriterio: { type: [string, "null"] }
+        puntajeMaximo: { type: number }
+        evaluable: { type: boolean }
+        nivelSugeridoId: { type: [string, "null"], format: uuid }
+        nivelSugeridoNombre: { type: [string, "null"] }
+        puntajeSugerido: { type: [number, "null"] }
+        justificacion: { type: [string, "null"] }
+        advertencia: { type: [string, "null"] }
+        nivelFinalId: { type: [string, "null"], format: uuid }
+        puntajeFinal: { type: [number, "null"] }
+        justificacionEditada: { type: [string, "null"] }
+        revisadoManual: { type: boolean }
+        orden: { type: integer }
+        niveles:
+          type: array
+          items: { $ref: "#/components/schemas/NivelOpcionResponse" }
+        citas:
+          type: array
+          items: { $ref: "#/components/schemas/CitaResponse" }
+    NivelOpcionResponse:
+      type: object
+      description: Nivel disponible para el criterio con su rango de puntaje ya resuelto.
+      properties:
+        id: { type: string, format: uuid }
+        nombre: { type: string }
+        descripcion: { type: [string, "null"] }
+        puntajeMin: { type: number }
+        puntajeMax: { type: number }
+        orden: { type: integer }
+    CitaResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        fragmentoId: { type: [string, "null"], format: uuid, description: "Fragmento de origen, si se pudo emparejar." }
+        textoCitado: { type: string }
+        orden: { type: integer }
+    CriterioRevisionRequest:
+      type: object
+      description: Reemplaza los campos editables del criterio. El puntaje debe caer en el rango del nivel.
+      properties:
+        nivelFinalId: { type: [string, "null"], format: uuid }
+        puntajeFinal: { type: [number, "null"] }
+        justificacionEditada: { type: [string, "null"] }
+        revisadoManual: { type: boolean }
+    ComentarioRequest:
+      type: object
+      properties:
+        comentarioGeneral: { type: [string, "null"], maxLength: 4000 }
+
+    # ---- Similitud
+    GenerarSimilitudRequest:
+      type: object
+      properties:
+        umbral:
+          type: [number, "null"]
+          minimum: 0.0
+          maximum: 1.0
+          description: Umbral de "similitud alta" (0..1). Si se omite, el default configurado (0.75).
+    ReporteSimilitudResponse:
+      type: object
+      properties:
+        loteId: { type: string, format: uuid }
+        umbral: { type: number }
+        generadoAt: { type: string, format: date-time }
+        aviso: { type: string, description: "Mensaje no-acusatorio fijo: el sistema no determina deshonestidad académica." }
+        entregas:
+          type: array
+          items: { $ref: "#/components/schemas/EntregaResumenSimilitud" }
+        pares:
+          type: array
+          description: Pares ordenados por similitud descendente.
+          items: { $ref: "#/components/schemas/ParSimilitudResponse" }
+    EntregaResumenSimilitud:
+      type: object
+      properties:
+        entregaId: { type: string, format: uuid }
+        identificador: { type: string }
+    ParSimilitudResponse:
+      type: object
+      properties:
+        entregaAId: { type: string, format: uuid }
+        entregaBId: { type: string, format: uuid }
+        similitudSemantica: { type: number }
+        similitudTextual: { type: [number, "null"], description: "null si alguna entrega tiene menos de n palabras." }
+        superaUmbral: { type: boolean }
+        fragmentos:
+          type: array
+          items: { $ref: "#/components/schemas/FragmentoSimilarResponse" }
+    FragmentoSimilarResponse:
+      type: object
+      properties:
+        tipo: { $ref: "#/components/schemas/TipoSimilitud" }
+        fragmentoAId: { type: [string, "null"], format: uuid }
+        textoA: { type: string }
+        fragmentoBId: { type: [string, "null"], format: uuid }
+        textoB: { type: string }
+        similitud: { type: number }
+
+    # ---- Reportes
+    ResumenGrupoResponse:
+      type: object
+      properties:
+        loteId: { type: string, format: uuid }
+        nombreLote: { type: string }
+        totalEvaluaciones: { type: integer }
+        puntajeTotalRubrica: { type: number }
+        estadisticas: { $ref: "#/components/schemas/EstadisticasNotas" }
+        criterios:
+          type: array
+          items: { $ref: "#/components/schemas/CriterioResumen" }
+        criteriosDificiles:
+          type: array
+          items: { type: string }
+        narrativa: { type: [string, "null"], description: "Texto LLM; null hasta que se genera." }
+    EstadisticasNotas:
+      type: object
+      properties:
+        promedio: { type: number }
+        mediana: { type: number }
+        minima: { type: number }
+        maxima: { type: number }
+        histograma:
+          type: array
+          items: { $ref: "#/components/schemas/RangoNota" }
+    RangoNota:
+      type: object
+      properties:
+        etiqueta: { type: string }
+        min: { type: number }
+        max: { type: number }
+        cantidad: { type: integer }
+    CriterioResumen:
+      type: object
+      properties:
+        criterioId: { type: string, format: uuid }
+        nombre: { type: string }
+        puntajeMaximo: { type: number }
+        promedio: { type: [number, "null"], description: "null si nadie tuvo puntaje en el criterio." }
+        promedioPct: { type: [number, "null"] }
+        evaluados: { type: integer }
+        distribucion:
+          type: array
+          description: "Mapa de dominio: cuántos alcanzaron cada nivel."
+          items: { $ref: "#/components/schemas/NivelConteo" }
+        sinNivel: { type: integer }
+    NivelConteo:
+      type: object
+      properties:
+        nivelId: { type: string, format: uuid }
+        nombre: { type: string }
+        cantidad: { type: integer }
+        porcentaje: { type: number }
+
+    # ---- Métricas
+    MetricasUsoResponse:
+      type: object
+      properties:
+        mes: { type: string, example: "2026-06" }
+        moneda: { type: string, example: "USD" }
+        umbralMensual: { type: number }
+        umbralSuperado: { type: boolean }
+        costoTotal: { type: number }
+        totalInputTokens: { type: integer, format: int64 }
+        totalOutputTokens: { type: integer, format: int64 }
+        docentes:
+          type: array
+          description: Orden descendente por costo estimado.
+          items: { $ref: "#/components/schemas/DocenteUsoResponse" }
+    DocenteUsoResponse:
+      type: object
+      properties:
+        docenteId: { type: string, format: uuid }
+        nombre: { type: [string, "null"] }
+        email: { type: [string, "null"] }
+        inputTokens: { type: integer, format: int64 }
+        outputTokens: { type: integer, format: int64 }
+        totalTokens: { type: integer, format: int64 }
+        costoEstimado: { type: number }
+    DocenteUsoDetalleResponse:
+      type: object
+      properties:
+        docenteId: { type: string, format: uuid }
+        nombre: { type: [string, "null"] }
+        email: { type: [string, "null"] }
+        mes: { type: string }
+        moneda: { type: string }
+        totalInputTokens: { type: integer, format: int64 }
+        totalOutputTokens: { type: integer, format: int64 }
+        costoTotal: { type: number }
+        porModelo:
+          type: array
+          items: { $ref: "#/components/schemas/UsoModeloResponse" }
+        porOperacion:
+          type: array
+          items: { $ref: "#/components/schemas/UsoOperacionResponse" }
+    UsoModeloResponse:
+      type: object
+      properties:
+        modelo: { type: string }
+        inputTokens: { type: integer, format: int64 }
+        outputTokens: { type: integer, format: int64 }
+        totalTokens: { type: integer, format: int64 }
+        costoEstimado: { type: number }
+    UsoOperacionResponse:
+      type: object
+      properties:
+        operacion: { $ref: "#/components/schemas/OperacionLlm" }
+        inputTokens: { type: integer, format: int64 }
+        outputTokens: { type: integer, format: int64 }
+        totalTokens: { type: integer, format: int64 }
+        costoEstimado: { type: number }
