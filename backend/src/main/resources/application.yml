@@ -108,6 +108,20 @@ app:
     # Tamaño del n-grama (palabras) de la similitud textual: más alto = más estricto.
     ngrama-textual: ${SIMILITUD_NGRAMA_TEXTUAL:5}
 
+  # Métricas de uso/costo del LLM . El costo se calcula on-read desde estas
+  # tarifas (precio por millón de tokens, in/out por modelo); umbral-mensual dispara la alerta del
+  # costo institucional del mes. Tarifas por defecto: Anthropic Sonnet 4.6 y Haiku 4.5.
+  costos:
+    moneda: ${COSTO_MONEDA:USD}
+    umbral-mensual: ${COSTO_UMBRAL_MENSUAL:50.00}
+    tarifas:
+      claude-sonnet-4-6:
+        input-por-millon: ${COSTO_SONNET_INPUT:3.00}
+        output-por-millon: ${COSTO_SONNET_OUTPUT:15.00}
+      claude-haiku-4-5:
+        input-por-millon: ${COSTO_HAIKU_INPUT:1.00}
+        output-por-millon: ${COSTO_HAIKU_OUTPUT:5.00}
+
 logging:
   level:
     org.flywaydb: info
