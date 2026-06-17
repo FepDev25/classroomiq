@@ -1,111 +1,190 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/*
+  classroomiq — sistema de diseño "Rúbrica: la decisión al margen".
+  El color codifica las dos voces del producto: el BORRADOR de la máquina
+  (teal/tinta, recesivo) y la DECISIÓN del docente (ocre, autoritativo).
+  Tres familias tipográficas con rol propio: grotesca (UI), serif (lectura
+  larga de entregas) y mono (puntajes, métricas, código).
+*/
+
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --radius: 0.5rem;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Superficies y tinta — papel frío, no crema */
+  --background: #f7f7f4;
+  --foreground: #16201d;
+  --card: #fdfdfb;
+  --card-foreground: #16201d;
+  --popover: #ffffff;
+  --popover-foreground: #16201d;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Primario = teal/tinta (marca, estructura, voz de la máquina) */
+  --primary: #0e5a63;
+  --primary-foreground: #f4fbfb;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --secondary: #ecede7;
+  --secondary-foreground: #283330;
+  --muted: #ecede7;
+  --muted-foreground: #59635e;
+  --accent: #e6ece9;
+  --accent-foreground: #15302e;
+
+  --destructive: #9e3b2e;
+  --destructive-foreground: #fbf2f0;
+
+  --border: #dcdcd2;
+  --input: #dcdcd2;
+  --ring: #0e5a63;
+
+  /* Voces semánticas del producto */
+  --sugerido: #0e5a63; /* propuesto por el LLM */
+  --sugerido-foreground: #f4fbfb;
+  --decision: #b26b2c; /* ajustado / decidido por el docente */
+  --decision-foreground: #fffaf3;
+
+  /* Estados de procesamiento de entrega */
+  --estado-pendiente: #8a8f88;
+  --estado-procesando: #0e5a63;
+  --estado-evaluando: #b26b2c;
+  --estado-listo: #3f7d5a;
+  --estado-error: #9e3b2e;
+
+  /* Niveles de desempeño (escala académica, no rojo/verde semáforo) */
+  --nivel-insuficiente: #9e3b2e;
+  --nivel-basico: #b26b2c;
+  --nivel-bueno: #3f7d5a;
+  --nivel-excelente: #0e5a63;
+
+  /* Gráficos */
+  --chart-1: #0e5a63;
+  --chart-2: #b26b2c;
+  --chart-3: #3f7d5a;
+  --chart-4: #9e3b2e;
+  --chart-5: #4e6a78;
+}
+
+.dark {
+  --background: #0f1513;
+  --foreground: #e7e9e3;
+  --card: #161d1a;
+  --card-foreground: #e7e9e3;
+  --popover: #161d1a;
+  --popover-foreground: #e7e9e3;
+
+  --primary: #2fa0a8;
+  --primary-foreground: #04201e;
+
+  --secondary: #1f2823;
+  --secondary-foreground: #e7e9e3;
+  --muted: #1f2823;
+  --muted-foreground: #9ba39d;
+  --accent: #233029;
+  --accent-foreground: #e7e9e3;
+
+  --destructive: #c25a4a;
+  --destructive-foreground: #fbf2f0;
+
+  --border: #2a332e;
+  --input: #303a34;
+  --ring: #2fa0a8;
+
+  --sugerido: #2fa0a8;
+  --sugerido-foreground: #04201e;
+  --decision: #d08a45;
+  --decision-foreground: #1c1206;
+
+  --estado-pendiente: #9aa097;
+  --estado-procesando: #2fa0a8;
+  --estado-evaluando: #d08a45;
+  --estado-listo: #5fa37c;
+  --estado-error: #c25a4a;
+
+  --nivel-insuficiente: #c25a4a;
+  --nivel-basico: #d08a45;
+  --nivel-bueno: #5fa37c;
+  --nivel-excelente: #2fa0a8;
+
+  --chart-1: #2fa0a8;
+  --chart-2: #d08a45;
+  --chart-3: #5fa37c;
+  --chart-4: #c25a4a;
+  --chart-5: #7f97a4;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-sugerido: var(--sugerido);
+  --color-sugerido-foreground: var(--sugerido-foreground);
+  --color-decision: var(--decision);
+  --color-decision-foreground: var(--decision-foreground);
+
+  --color-estado-pendiente: var(--estado-pendiente);
+  --color-estado-procesando: var(--estado-procesando);
+  --color-estado-evaluando: var(--estado-evaluando);
+  --color-estado-listo: var(--estado-listo);
+  --color-estado-error: var(--estado-error);
+
+  --color-nivel-insuficiente: var(--nivel-insuficiente);
+  --color-nivel-basico: var(--nivel-basico);
+  --color-nivel-bueno: var(--nivel-bueno);
+  --color-nivel-excelente: var(--nivel-excelente);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans:
+    'Bricolage Grotesque', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Source Serif 4', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  /* La lectura larga (entregas, justificaciones del LLM) usa la serif. */
+  .prose-entrega {
+    font-family: var(--font-serif);
+    line-height: 1.7;
   }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
 }
