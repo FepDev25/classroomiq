@@ -37,6 +37,9 @@ import com.classroomiq.backend.institucion.domain.Institucion;
 import com.classroomiq.backend.institucion.repository.InstitucionRepository;
 import com.classroomiq.backend.materia.domain.Materia;
 import com.classroomiq.backend.materia.repository.MateriaRepository;
+import com.classroomiq.backend.metricas.domain.OperacionLlm;
+import com.classroomiq.backend.metricas.domain.RegistroUsoLlm;
+import com.classroomiq.backend.metricas.repository.RegistroUsoLlmRepository;
 import com.classroomiq.backend.provider.embeddings.EmbeddingProvider;
 import com.classroomiq.backend.provider.llm.LlmProvider;
 import com.classroomiq.backend.provider.llm.LlmResultado;
@@ -150,6 +153,8 @@ class MotorEvaluacionTest {
     private CitaFragmentoRepository citas;
     @Autowired
     private MotorEvaluacion motor;
+    @Autowired
+    private RegistroUsoLlmRepository registrosUso;
 
     @AfterEach
     void limpiar() {
@@ -208,6 +213,18 @@ class MotorEvaluacionTest {
 
             // Total proyectado (ModoTotal.SUMA) solo sobre los criterios con puntaje: 20.
             assertThat(eval.getPuntajeTotalSugerido()).isEqualByComparingTo("20.00");
+
+            // Fase 6: se capturó el uso del LLM de la única llamada (el criterio evaluable). El
+            // no-evaluable no llama al modelo, así que hay exactamente un registro.
+            assertThat(registrosUso.findAll()).singleElement().satisfies(r -> {
+                assertThat(r.getOperacion()).isEqualTo(OperacionLlm.EVALUACION);
+                assertThat(r.getTier()).isEqualTo(ModeloTier.POTENTE);
+                assertThat(r.getModelo()).isEqualTo("fake");
+                assertThat(r.getInputTokens()).isEqualTo(10);
+                assertThat(r.getOutputTokens()).isEqualTo(20);
+                assertThat(r.getDocenteId()).isEqualTo(docente);
+                assertThat(r.getEntregaId()).isEqualTo(entregaId);
+            });
 
             // Reevaluación idempotente: sigue habiendo una sola evaluación y dos criterios.
             Evaluacion reeval = motor.evaluar(entregaId);
