@@ -1,15 +1,10 @@
 package com.classroomiq.backend;
 
-import static org.hamcrest.Matchers.closeTo;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.closeTo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +19,10 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import com.classroomiq.backend.provider.llm.LlmProvider;
-import com.classroomiq.backend.provider.llm.LlmResultado;
-import com.classroomiq.backend.provider.llm.LlmSolicitud;
-import com.classroomiq.backend.provider.llm.ModeloTier;
-import com.classroomiq.backend.provider.llm.UsoTokens;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.classroomiq.backend.common.tenant.TenantContext;
 import com.classroomiq.backend.entrega.domain.Entrega;
@@ -46,6 +39,11 @@ import com.classroomiq.backend.institucion.domain.Institucion;
 import com.classroomiq.backend.institucion.repository.InstitucionRepository;
 import com.classroomiq.backend.materia.domain.Materia;
 import com.classroomiq.backend.materia.repository.MateriaRepository;
+import com.classroomiq.backend.provider.llm.LlmProvider;
+import com.classroomiq.backend.provider.llm.LlmResultado;
+import com.classroomiq.backend.provider.llm.LlmSolicitud;
+import com.classroomiq.backend.provider.llm.ModeloTier;
+import com.classroomiq.backend.provider.llm.UsoTokens;
 import com.classroomiq.backend.rubrica.domain.Criterio;
 import com.classroomiq.backend.rubrica.domain.ModoTotal;
 import com.classroomiq.backend.rubrica.domain.NivelDesempeno;
