@@ -50,6 +50,11 @@ app:
     issuer: classroomiq
     secret: ${JWT_SECRET:dev-only-secret-change-me-please-32bytes-minimum-aaaaaaaa}
     access-token-ttl: PT1H
+  # CORS: orígenes (navegador) autorizados a llamar a la API. En desarrollo, el dev server del
+  # frontend (Vite, puerto 5173). Acepta varios separados por comas (CORS_ALLOWED_ORIGINS).
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
   # Siembra de datos de demo al arrancar (institución + admin + docente + rúbricas de ejemplo).
   # Idempotente: solo siembra si la base está vacía. Desactivado en prod y en tests.
   seed:
