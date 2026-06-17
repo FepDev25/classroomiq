@@ -75,7 +75,17 @@ public class ResumenGrupoService {
      */
     @Transactional(readOnly = true)
     public ResumenGrupoResponse obtener(UUID loteId) {
-        Lote lote = loteService.cargarPropio(loteId);
+        return resumir(loteService.cargarPropio(loteId));
+    }
+
+    /**
+     * Computa el resumen de un lote YA autorizado. El llamador debe haber validado el acceso (el
+     * docente dueño vía {@link #obtener}, o un coordinador con la materia asignada). No verifica
+     * propiedad: solo agrega las evaluaciones aprobadas.
+     */
+    @Transactional(readOnly = true)
+    public ResumenGrupoResponse resumir(Lote lote) {
+        UUID loteId = lote.getId();
 
         List<UUID> listas = entregas.findAllByLoteId(loteId).stream()
                 .filter(e -> e.getEstado() == EstadoEntrega.LISTO)
