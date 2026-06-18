@@ -35,9 +35,7 @@ const loginSearchSchema = z.object({
 
 /** Solo permite rutas internas como destino — evita open-redirects. */
 function destinoSeguro(redirectTo: string | undefined): string {
-  return redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
-    ? redirectTo
-    : '/'
+  return redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/'
 }
 
 export const Route = createFileRoute('/login')({

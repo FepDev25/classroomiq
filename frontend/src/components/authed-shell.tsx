@@ -23,12 +23,28 @@ const ROL_LABEL: Record<Rol, string> = {
   COORDINADOR: 'Coordinador',
 }
 
+/** Enlaces de navegación por rol. Crece a medida que se construyen las pantallas. */
+const NAV_POR_ROL: Record<Rol, { to: string; label: string }[]> = {
+  DOCENTE: [
+    { to: '/materias', label: 'Materias' },
+    { to: '/lotes', label: 'Lotes' },
+  ],
+  ADMIN: [
+    { to: '/admin/cuentas', label: 'Cuentas' },
+    { to: '/admin/coordinadores', label: 'Coordinadores' },
+  ],
+  COORDINADOR: [],
+}
+
 /**
  * Cascarón de las vistas autenticadas: cabecera con marca + navegación + menú
  * de usuario, contenido, y pie con el principio inamovible. La navegación por
  * materias/lotes/revisión se amplía a partir de H2.
  */
 export function AuthedShell({ children }: { children: ReactNode }) {
+  const { rol } = useAuth()
+  const navItems = rol ? NAV_POR_ROL[rol] : []
+
   return (
     <div className="bg-background text-foreground flex min-h-svh flex-col">
       <header className="border-border bg-background/80 sticky top-0 z-10 border-b backdrop-blur-sm">
@@ -37,6 +53,15 @@ export function AuthedShell({ children }: { children: ReactNode }) {
             <Link to="/" className="focus-visible:ring-ring/50 rounded-sm focus-visible:ring-2">
               <Brand />
             </Link>
+            {navItems.length > 0 ? (
+              <nav className="flex items-center gap-1 text-sm">
+                {navItems.map((item) => (
+                  <NavLink key={item.to} to={item.to}>
+                    {item.label}
+                  </NavLink>
+                ))}
+              </nav>
+            ) : null}
           </div>
           <div className="flex items-center gap-1">
             <ThemeToggle />
@@ -56,6 +81,19 @@ export function AuthedShell({ children }: { children: ReactNode }) {
         </div>
       </footer>
     </div>
+  )
+}
+
+function NavLink({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <Link
+      to={to}
+      className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-md px-3 py-1.5 font-medium transition-colors"
+      activeProps={{ className: 'text-foreground bg-accent' }}
+      activeOptions={{ exact: false }}
+    >
+      {children}
+    </Link>
   )
 }
 
