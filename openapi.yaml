@@ -203,6 +203,26 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
 
+  # -------------------------------------------------------- Admin · Materias
+  /api/admin/materias:
+    get:
+      operationId: getAdminMaterias
+      tags: [Admin · Coordinadores]
+      summary: Catálogo de materias de la institución
+      description: >
+        Lista todas las materias del tenant con su docente dueño, para que el admin elija cuáles
+        asignar a un coordinador. Solo lectura del catálogo; no expone el contenido de las materias.
+      responses:
+        "200":
+          description: Materias de la institución.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminMateriaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
   # ------------------------------------------------------ Admin · Métricas
   /api/admin/metricas/uso:
     get:
@@ -1024,6 +1044,17 @@ components:
         descripcion: { type: [string, "null"] }
         archivada: { type: boolean }
 
+    AdminMateriaResponse:
+      type: object
+      description: Materia con su docente dueño, para el catálogo del admin (asignación a coordinadores).
+      properties:
+        id: { type: string, format: uuid }
+        nombre: { type: string }
+        periodoAcademico: { type: [string, "null"] }
+        docenteId: { type: string, format: uuid }
+        docenteNombre: { type: [string, "null"] }
+        archivada: { type: boolean }
+
     # ---- Rúbrica
     RubricaRequest:
       type: object
@@ -1061,8 +1092,8 @@ components:
         puntajeMin: { type: [number, "null"], description: "Para tipoPuntaje RANGO." }
         puntajeMax: { type: [number, "null"], description: "Para tipoPuntaje RANGO." }
         puntajeValor: { type: [number, "null"], description: "Para tipoPuntaje FIJO." }
-        pctMin: { type: [number, "null"], description: "Para tipoPuntaje BANDA_PCT (0..1)." }
-        pctMax: { type: [number, "null"], description: "Para tipoPuntaje BANDA_PCT (0..1)." }
+        pctMin: { type: [number, "null"], description: "Para tipoPuntaje BANDA_PCT (porcentaje 0..100)." }
+        pctMax: { type: [number, "null"], description: "Para tipoPuntaje BANDA_PCT (porcentaje 0..100)." }
     RubricaResponse:
       type: object
       properties:
