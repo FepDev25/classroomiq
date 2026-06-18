@@ -24,4 +24,13 @@ export const queryKeys = {
   materiasAdmin: ['admin', 'materias'] as const,
   coordinadorMaterias: (coordinadorId: string) =>
     ['admin', 'coordinadores', coordinadorId, 'materias'] as const,
+
+  metricasUso: (mes: string) => ['admin', 'metricas', 'uso', mes] as const,
+  metricasUsoDocente: (docenteId: string, mes: string) =>
+    ['admin', 'metricas', 'uso', mes, docenteId] as const,
+
+  coordinadorMateriasList: ['coordinador', 'materias'] as const,
+  coordinadorLotes: (materiaId: string) =>
+    ['coordinador', 'materias', materiaId, 'lotes'] as const,
+  coordinadorResumen: (loteId: string) => ['coordinador', 'lotes', loteId, 'resumen'] as const,
 } as const

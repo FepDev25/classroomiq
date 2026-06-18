@@ -6,6 +6,8 @@ import {
   cambiarActivoUsuario,
   crearUsuario,
   desasignarMateria,
+  getDocenteUsoDetalle,
+  getMetricasUso,
   listMateriasAdmin,
   listMateriasAsignadas,
   listUsuarios,
@@ -61,5 +63,20 @@ export function useDesasignarMateria(coordinadorId: string) {
     mutationFn: (materiaId: string) => desasignarMateria(coordinadorId, materiaId),
     onSuccess: (asignadas) =>
       qc.setQueryData(queryKeys.coordinadorMaterias(coordinadorId), asignadas),
+  })
+}
+
+export function useMetricasUso(mes: string) {
+  return useQuery({
+    queryKey: queryKeys.metricasUso(mes),
+    queryFn: () => getMetricasUso(mes),
+  })
+}
+
+export function useDocenteUsoDetalle(docenteId: string, mes: string) {
+  return useQuery({
+    queryKey: queryKeys.metricasUsoDocente(docenteId, mes),
+    queryFn: () => getDocenteUsoDetalle(docenteId, mes),
+    enabled: Boolean(docenteId),
   })
 }

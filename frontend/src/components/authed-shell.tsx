@@ -32,8 +32,9 @@ const NAV_POR_ROL: Record<Rol, { to: string; label: string }[]> = {
   ADMIN: [
     { to: '/admin/cuentas', label: 'Cuentas' },
     { to: '/admin/coordinadores', label: 'Coordinadores' },
+    { to: '/admin/metricas', label: 'Uso y costo' },
   ],
-  COORDINADOR: [],
+  COORDINADOR: [{ to: '/coordinador', label: 'Reportes' }],
 }
 
 /**

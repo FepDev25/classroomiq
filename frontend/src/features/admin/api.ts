@@ -8,6 +8,12 @@ export type AdminMateria = components['schemas']['AdminMateriaResponse']
 export type Materia = components['schemas']['MateriaResponse']
 export type Rol = components['schemas']['Rol']
 
+export type MetricasUso = components['schemas']['MetricasUsoResponse']
+export type DocenteUso = components['schemas']['DocenteUsoResponse']
+export type DocenteUsoDetalle = components['schemas']['DocenteUsoDetalleResponse']
+export type UsoModelo = components['schemas']['UsoModeloResponse']
+export type UsoOperacion = components['schemas']['UsoOperacionResponse']
+
 // ---- Cuentas (usuarios)
 
 export async function listUsuarios(): Promise<Usuario[]> {
@@ -62,6 +68,27 @@ export async function desasignarMateria(
     '/api/admin/coordinadores/{coordinadorId}/materias/{materiaId}',
     { params: { path: { coordinadorId, materiaId } } },
   )
+  if (error) throw toApiError(error)
+  return data
+}
+
+// ---- Métricas de uso/costo (mes en formato YYYY-MM; si se omite, el mes actual)
+
+export async function getMetricasUso(mes?: string): Promise<MetricasUso> {
+  const { data, error } = await api.GET('/api/admin/metricas/uso', {
+    params: { query: mes ? { mes } : {} },
+  })
+  if (error) throw toApiError(error)
+  return data
+}
+
+export async function getDocenteUsoDetalle(
+  docenteId: string,
+  mes?: string,
+): Promise<DocenteUsoDetalle> {
+  const { data, error } = await api.GET('/api/admin/metricas/uso/{docenteId}', {
+    params: { path: { docenteId }, query: mes ? { mes } : {} },
+  })
   if (error) throw toApiError(error)
   return data
 }
