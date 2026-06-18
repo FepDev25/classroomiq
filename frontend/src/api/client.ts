@@ -3,7 +3,7 @@ import createClient, { type Middleware } from 'openapi-fetch'
 import type { paths } from './schema'
 import { clearSession, getToken } from '@/features/auth/session'
 
-const baseUrl = import.meta.env.VITE_API_URL
+export const baseUrl = import.meta.env.VITE_API_URL
 
 if (!baseUrl) {
   // Falla ruidosa en dev: sin baseUrl el cliente no puede llamar al backend.
@@ -39,5 +39,10 @@ const unauthorizedMiddleware: Middleware = {
   },
 }
 
-export const api = createClient<paths>({ baseUrl })
+export const api = createClient<paths>({
+  baseUrl,
+  // Difiere al fetch global en cada llamada (no captura la referencia al crear
+  // el cliente). Necesario para que MSW pueda interceptar en los tests.
+  fetch: (input: Request) => globalThis.fetch(input),
+})
 api.use(authMiddleware, unauthorizedMiddleware)

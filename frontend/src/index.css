@@ -187,4 +187,21 @@
     font-family: var(--font-serif);
     line-height: 1.7;
   }
+
+  /* Destello al saltar de una cita (panel derecho) a su fragmento (izquierdo). */
+  .evidencia-flash {
+    animation: evidencia-flash 1.2s ease-out;
+  }
+
+  @keyframes evidencia-flash {
+    0%,
+    30% {
+      background-color: color-mix(in oklch, var(--primary) 18%, transparent);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    100% {
+      background-color: transparent;
+      box-shadow: 0 0 0 2px transparent;
+    }
+  }
 }

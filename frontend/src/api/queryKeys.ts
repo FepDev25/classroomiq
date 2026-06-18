@@ -14,8 +14,14 @@ export const queryKeys = {
   lotes: ['lotes'] as const,
   lote: (id: string) => ['lotes', id] as const,
   entregas: (loteId: string) => ['lotes', loteId, 'entregas'] as const,
+  entrega: (id: string) => ['entregas', id] as const,
 
   evaluacion: (entregaId: string) => ['entregas', entregaId, 'evaluacion'] as const,
   similitud: (loteId: string) => ['lotes', loteId, 'similitud'] as const,
   resumen: (loteId: string) => ['lotes', loteId, 'resumen'] as const,
+
+  usuarios: ['admin', 'usuarios'] as const,
+  materiasAdmin: ['admin', 'materias'] as const,
+  coordinadorMaterias: (coordinadorId: string) =>
+    ['admin', 'coordinadores', coordinadorId, 'materias'] as const,
 } as const
