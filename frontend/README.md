@@ -2,7 +2,10 @@
 
 Interfaz web de **classroomiq**, la plataforma de asistencia a evaluación docente universitaria. El frontend encarna el principio inamovible del producto: **el docente es el juez; la herramienta prepara la evaluación**. Los valores que sugiere el LLM se muestran siempre como **borradores**; la nota final la decide el profesor.
 
-> v1 cubre el camino completo del **docente**. Admin y coordinador quedan para v2.
+> **v1** cubre el camino completo del **docente**. **v2** abre la plataforma a los roles
+> institucionales: **admin** (gestión de cuentas, asignación de coordinadores, dashboard de
+> uso/costo del LLM) y **coordinador** (acceso de solo lectura a los reportes agregados por grupo
+> de las materias asignadas — nunca trabajos, evaluaciones individuales ni similitud).
 
 ## Stack
 
@@ -26,7 +29,17 @@ pnpm gen:api                # genera src/api/schema.d.ts desde ../openapi.yaml
 pnpm dev                    # http://localhost:5173
 ```
 
-Credenciales del seed de demo del backend: `docente@demo.local` / `docente12345`.
+Credenciales del seed de demo del backend, una por rol:
+
+| Rol | Email | Contraseña |
+|---|---|---|
+| Docente | `docente@demo.local` | `docente12345` |
+| Admin | `admin@demo.local` | `admin12345` |
+| Coordinador | `coordinador@demo.local` | `coord12345` |
+
+Tras el login, el **dispatcher por rol** enruta a cada usuario a su portal (docente → `/materias`,
+admin → `/admin/cuentas`, coordinador → `/coordinador`); las rutas quedan protegidas por **guards de
+rol** y el shell muestra solo la navegación de ese rol.
 
 ## Scripts
 
@@ -50,7 +63,7 @@ rojo todo lo que dejó de cuadrar.
 ```
 src/
   api/           # cliente generado (schema.d.ts), client.ts (Bearer + 401), errores, queryKeys
-  features/      # por dominio: auth, materias, rubricas, lotes, revision, similitud, reportes
+  features/      # por dominio: auth, materias, rubricas, lotes, revision, similitud, reportes, admin, coordinador
   components/ui/ # primitivos de Shadcn
   components/    # compartidos (shell, estados, marca, tema)
   hooks/         # transversales (useEventosLote — SSE)
@@ -67,13 +80,14 @@ Los tipos de dominio siempre se derivan del schema generado.
 - **SSE con Bearer:** la `EventSource` nativa no envía `Authorization`; se usa `@microsoft/fetch-event-source`. `useEventosLote` abre el stream del lote y actualiza el cache de entregas por evento (`setQueryData`).
 - **Subida de entregas:** el `tipo` (DOCUMENTO/CODIGO/MIXTA) se **deriva** de las extensiones en cliente (espejo del backend) para evitar el 422. El progreso es indeterminado ("Subiendo…") porque `fetch` no expone bytes.
 - **Pantalla de revisión (la pieza central):** dos paneles. Como el backend no expone el texto completo de la entrega, el panel izquierdo muestra **evidencia** (archivos + fragmentos citados por el LLM); las citas del panel derecho hacen scroll a su fragmento. El puntaje se acota al rango del nivel, el total se proyecta en vivo, y **aprobar congela** la evaluación.
-- **Export PDF:** se genera en cliente (no hay endpoint backend). `@react-pdf/renderer` se carga por **dynamic import** al exportar, fuera del bundle principal.
+- **Export PDF:** se genera en cliente (no hay endpoint backend). `@react-pdf/renderer` se carga por **dynamic import** al exportar, fuera del bundle principal. El **export Excel/CSV** por lote reusa la misma recolección de datos (`features/lotes/export/`); SheetJS (`xlsx`) también se carga diferido.
+- **Multi-rol (v2):** un único shell autenticado con navegación derivada del rol del JWT. El **portal admin** (`/admin/*`) cubre cuentas, asignación de coordinadores y el **dashboard de uso/costo** (`/api/admin/metricas/uso`, selector de mes, alerta de umbral, desglose por docente/modelo/operación con Recharts). La **vista coordinador** (`/coordinador/*`) es de **solo lectura** y reusa el componente compartido de resumen por grupo (`ResumenGrupoView`) sin el botón de generar narrativa; por diseño no ofrece ninguna ruta a trabajos, evaluaciones individuales ni similitud.
 
 ## Tests
 
 - **Vitest + Testing Library** para lógica pura y hooks (clasificación tipo↔archivos, niveles/total de revisión, `useEventosLote` con SSE mockeado, mapeo de `ProblemDetail`).
 - **MSW** mockea el contrato en los tests de hooks/red (handlers en `src/test/msw/`).
-- **Playwright** (`e2e/`) cubre el camino crítico del docente. Requiere el **stack vivo** (backend + Postgres + Ollama + frontend) y navegadores instalados (`pnpm exec playwright install`); se corre en la fase de pruebas integrales, no en el CI unitario. Variables: `E2E_BASE_URL`, `E2E_EMAIL`, `E2E_PASSWORD`.
+- **Playwright** (`e2e/`) cubre el camino crítico del **docente** (`critico.spec.ts`), el portal **admin** (`admin.spec.ts`: cuentas, métricas de uso/costo, coordinadores) y la vista **coordinador** (`coordinador.spec.ts`: materias asignadas en solo lectura + guard de rol). Requiere el **stack vivo** (backend + Postgres + Ollama + frontend) y navegadores instalados (`pnpm exec playwright install`); se corre en la fase de pruebas integrales, no en el CI unitario. Variables: `E2E_BASE_URL`, `E2E_EMAIL`/`E2E_PASSWORD` (docente), `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`, `E2E_COORD_EMAIL`/`E2E_COORD_PASSWORD`.
 
 ## Convenciones
 
