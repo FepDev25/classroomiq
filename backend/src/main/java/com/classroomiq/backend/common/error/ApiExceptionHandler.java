@@ -11,6 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
@@ -73,6 +74,18 @@ public class ApiExceptionHandler {
     public ProblemDetail handleArchivoMuyGrande(MaxUploadSizeExceededException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE,
                 "El archivo o la solicitud superan el tamaño máximo permitido");
+    }
+
+    /**
+     * El cliente cerró la conexión (típico en el stream SSE de {@code /api/lotes/{id}/eventos}:
+     * el navegador cierra el EventSource al navegar, recargar o al terminar el lote). El socket ya
+     * está roto ("Tubería rota") y la respuesta comprometida, así que no hay a quién responderle.
+     * Devolvemos {@code void} (sin cuerpo) para evitar que el handler genérico intente serializar un
+     * {@link ProblemDetail} sobre {@code text/event-stream} — lo que provocaba un ERROR + WARN falsos.
+     */
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public void handleClienteDesconectado(AsyncRequestNotUsableException ex) {
+        log.debug("Cliente desconectado durante respuesta async/SSE: {}", ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
