@@ -31,11 +31,11 @@ pnpm dev                    # http://localhost:5173
 
 Credenciales del seed de demo del backend, una por rol:
 
-| Rol | Email | Contraseña |
-|---|---|---|
-| Docente | `docente@demo.local` | `docente12345` |
-| Admin | `admin@demo.local` | `admin12345` |
-| Coordinador | `coordinador@demo.local` | `coord12345` |
+| Rol         | Email                    | Contraseña     |
+| ----------- | ------------------------ | -------------- |
+| Docente     | `docente@demo.local`     | `docente12345` |
+| Admin       | `admin@demo.local`       | `admin12345`   |
+| Coordinador | `coordinador@demo.local` | `coord12345`   |
 
 Tras el login, el **dispatcher por rol** enruta a cada usuario a su portal (docente → `/materias`,
 admin → `/admin/cuentas`, coordinador → `/coordinador`); las rutas quedan protegidas por **guards de
@@ -43,17 +43,17 @@ rol** y el shell muestra solo la navegación de ese rol.
 
 ## Scripts
 
-| Script | Qué hace |
-|---|---|
-| `pnpm dev` | Servidor de desarrollo (HMR). |
-| `pnpm build` | Genera rutas, typecheck y build de producción. |
-| `pnpm preview` | Sirve el build. |
-| `pnpm gen:api` | Regenera los tipos TS desde `../openapi.yaml`. |
-| `pnpm gen:routes` | Regenera el árbol de rutas de TanStack Router. |
-| `pnpm typecheck` | `tsc` sin emitir. |
-| `pnpm lint` / `pnpm format` | ESLint (+ jsx-a11y) / Prettier. |
-| `pnpm test` / `pnpm test:run` | Vitest (watch / una pasada). |
-| `pnpm e2e` | Playwright (requiere el stack vivo — ver más abajo). |
+| Script                        | Qué hace                                             |
+| ----------------------------- | ---------------------------------------------------- |
+| `pnpm dev`                    | Servidor de desarrollo (HMR).                        |
+| `pnpm build`                  | Genera rutas, typecheck y build de producción.       |
+| `pnpm preview`                | Sirve el build.                                      |
+| `pnpm gen:api`                | Regenera los tipos TS desde `../openapi.yaml`.       |
+| `pnpm gen:routes`             | Regenera el árbol de rutas de TanStack Router.       |
+| `pnpm typecheck`              | `tsc` sin emitir.                                    |
+| `pnpm lint` / `pnpm format`   | ESLint (+ jsx-a11y) / Prettier.                      |
+| `pnpm test` / `pnpm test:run` | Vitest (watch / una pasada).                         |
+| `pnpm e2e`                    | Playwright (requiere el stack vivo — ver más abajo). |
 
 **Al cambiar el contrato del backend:** regenera con `pnpm gen:api`; TypeScript marca en
 rojo todo lo que dejó de cuadrar.
@@ -87,7 +87,7 @@ Los tipos de dominio siempre se derivan del schema generado.
 
 - **Vitest + Testing Library** para lógica pura y hooks (clasificación tipo↔archivos, niveles/total de revisión, `useEventosLote` con SSE mockeado, mapeo de `ProblemDetail`).
 - **MSW** mockea el contrato en los tests de hooks/red (handlers en `src/test/msw/`).
-- **Playwright** (`e2e/`) cubre el camino crítico del **docente** (`critico.spec.ts`), el portal **admin** (`admin.spec.ts`: cuentas, métricas de uso/costo, coordinadores) y la vista **coordinador** (`coordinador.spec.ts`: materias asignadas en solo lectura + guard de rol). Requiere el **stack vivo** (backend + Postgres + Ollama + frontend) y navegadores instalados (`pnpm exec playwright install`); se corre en la fase de pruebas integrales, no en el CI unitario. Variables: `E2E_BASE_URL`, `E2E_EMAIL`/`E2E_PASSWORD` (docente), `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`, `E2E_COORD_EMAIL`/`E2E_COORD_PASSWORD`.
+- **Playwright** (`e2e/`) cubre el camino crítico del **docente** (`critico.spec.ts`), el portal **admin** (`admin.spec.ts`: cuentas, métricas de uso/costo, coordinadores) y la vista **coordinador** (`coordinador.spec.ts`: materias asignadas en solo lectura + guard de rol). Además, sobre las vistas multi-rol nuevas: un **pase de accesibilidad con axe-core** (`a11y.spec.ts`, vía `@axe-core/playwright`, falla ante violaciones WCAG A/AA de impacto `critical`/`serious`) y un **pase responsive en tablet** (`responsive.spec.ts`, 768×1024, sin desbordamiento horizontal). Requiere el **stack vivo** (backend + Postgres + Ollama + frontend) y navegadores instalados (`pnpm exec playwright install`); se corre en la fase de pruebas integrales, no en el CI unitario. Variables: `E2E_BASE_URL`, `E2E_EMAIL`/`E2E_PASSWORD` (docente), `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`, `E2E_COORD_EMAIL`/`E2E_COORD_PASSWORD`.
 
 ## Convenciones
 
