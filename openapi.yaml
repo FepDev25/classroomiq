@@ -577,6 +577,25 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
+  /api/entregas/{id}/contenido:
+    get:
+      operationId: getEntregasByIdContenido
+      tags: [Lotes y entregas]
+      summary: Contenido completo de la entrega
+      description: |
+        Texto íntegro de la entrega, reconstruido bajo demanda (re-extracción de los archivos en
+        disco; sin costo de LLM/embeddings). Lo usa el panel de revisión para mostrar el documento
+        completo con las citas del motor resaltadas en su contexto.
+      parameters: [{ $ref: "#/components/parameters/PathId" }]
+      responses:
+        "200":
+          description: Contenido por archivo y sección.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ContenidoEntregaResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
   /api/lotes/{id}/procesar:
     post:
       operationId: postLotesByIdProcesar
@@ -1169,6 +1188,32 @@ components:
         tamanoBytes: { type: integer, format: int64 }
         rol: { $ref: "#/components/schemas/RolArchivo" }
         orden: { type: integer }
+    ContenidoEntregaResponse:
+      type: object
+      description: Texto completo de la entrega, reconstruido por re-extracción (sin costo de LLM).
+      properties:
+        entregaId: { type: string, format: uuid }
+        archivos:
+          type: array
+          items: { $ref: "#/components/schemas/ArchivoContenidoResponse" }
+    ArchivoContenidoResponse:
+      type: object
+      properties:
+        archivoId: { type: string, format: uuid }
+        nombreOriginal: { type: string }
+        rol: { $ref: "#/components/schemas/RolArchivo" }
+        secciones:
+          type: array
+          items: { $ref: "#/components/schemas/SeccionContenidoResponse" }
+    SeccionContenidoResponse:
+      type: object
+      description: Sección de texto limpio (página, título, archivo o celda de código).
+      properties:
+        titulo: { type: [string, "null"] }
+        lenguaje: { type: [string, "null"] }
+        lineaInicio: { type: [integer, "null"] }
+        lineaFin: { type: [integer, "null"] }
+        texto: { type: string }
     ProcesamientoResponse:
       type: object
       properties:

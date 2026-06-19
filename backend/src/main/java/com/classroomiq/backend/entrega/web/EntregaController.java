@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.classroomiq.backend.entrega.EntregaService;
 import com.classroomiq.backend.entrega.domain.TipoEntrega;
+import com.classroomiq.backend.entrega.dto.ContenidoEntregaResponse;
 import com.classroomiq.backend.entrega.dto.EntregaResponse;
 
 @RestController
@@ -47,6 +48,11 @@ public class EntregaController {
     @GetMapping("/api/entregas/{id}")
     public EntregaResponse obtener(@PathVariable UUID id) {
         return entregas.obtener(id);
+    }
+
+    @GetMapping("/api/entregas/{id}/contenido")
+    public ContenidoEntregaResponse contenido(@PathVariable UUID id) {
+        return entregas.contenido(id);
     }
 
     @DeleteMapping("/api/entregas/{id}")

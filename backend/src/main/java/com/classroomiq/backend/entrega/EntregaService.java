@@ -15,7 +15,12 @@ import com.classroomiq.backend.entrega.domain.Entrega;
 import com.classroomiq.backend.entrega.domain.Lote;
 import com.classroomiq.backend.entrega.domain.RolArchivo;
 import com.classroomiq.backend.entrega.domain.TipoEntrega;
+import com.classroomiq.backend.entrega.dto.ArchivoContenidoResponse;
+import com.classroomiq.backend.entrega.dto.ContenidoEntregaResponse;
 import com.classroomiq.backend.entrega.dto.EntregaResponse;
+import com.classroomiq.backend.entrega.dto.SeccionContenidoResponse;
+import com.classroomiq.backend.entrega.extraccion.SegmentoTexto;
+import com.classroomiq.backend.entrega.extraccion.ServicioExtraccion;
 import com.classroomiq.backend.entrega.repository.EntregaRepository;
 import com.classroomiq.backend.entrega.storage.StorageService;
 
@@ -31,14 +36,16 @@ public class EntregaService {
     private final EntregaRepository entregas;
     private final LoteService lotes;
     private final StorageService storage;
+    private final ServicioExtraccion extraccion;
     private final EntregaMapper mapper;
     private final AuthContext auth;
 
     public EntregaService(EntregaRepository entregas, LoteService lotes, StorageService storage,
-            EntregaMapper mapper, AuthContext auth) {
+            ServicioExtraccion extraccion, EntregaMapper mapper, AuthContext auth) {
         this.entregas = entregas;
         this.lotes = lotes;
         this.storage = storage;
+        this.extraccion = extraccion;
         this.mapper = mapper;
         this.auth = auth;
     }
@@ -90,6 +97,35 @@ public class EntregaService {
     @Transactional(readOnly = true)
     public EntregaResponse obtener(UUID id) {
         return mapper.toResponse(cargarPropia(id));
+    }
+
+    /**
+     * Reconstruye el texto completo de la entrega (re-extrayéndolo de los archivos en disco) para el
+     * panel de revisión. No consume tokens de LLM ni embeddings: reusa el pipeline de extracción de la
+     * Fase 3. Los segmentos llegan limpios y sin el solapamiento del chunking, agrupados por archivo.
+     */
+    @Transactional(readOnly = true)
+    public ContenidoEntregaResponse contenido(UUID id) {
+        Entrega entrega = cargarPropia(id);
+        List<ArchivoEntrega> archivos = entrega.getArchivos().stream()
+                .sorted(java.util.Comparator.comparingInt(ArchivoEntrega::getOrden))
+                .toList();
+
+        List<SegmentoTexto> segmentos = extraccion.extraer(archivos);
+
+        List<ArchivoContenidoResponse> contenido = archivos.stream()
+                .map(archivo -> new ArchivoContenidoResponse(
+                        archivo.getId(),
+                        archivo.getNombreOriginal(),
+                        archivo.getRol(),
+                        segmentos.stream()
+                                .filter(s -> archivo.getId().equals(s.archivoId()))
+                                .map(s -> new SeccionContenidoResponse(
+                                        s.seccion(), s.lenguaje(), s.lineaInicio(), s.lineaFin(), s.contenido()))
+                                .toList()))
+                .toList();
+
+        return new ContenidoEntregaResponse(entrega.getId(), contenido);
     }
 
     @Transactional
