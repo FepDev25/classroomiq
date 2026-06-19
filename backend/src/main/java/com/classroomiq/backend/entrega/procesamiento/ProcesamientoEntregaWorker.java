@@ -14,7 +14,6 @@ import com.classroomiq.backend.entrega.domain.ArchivoEntrega;
 import com.classroomiq.backend.entrega.domain.Entrega;
 import com.classroomiq.backend.entrega.domain.EstadoEntrega;
 import com.classroomiq.backend.entrega.domain.EstadoLote;
-import com.classroomiq.backend.entrega.domain.Lote;
 import com.classroomiq.backend.entrega.repository.ArchivoEntregaRepository;
 import com.classroomiq.backend.entrega.repository.EntregaRepository;
 import com.classroomiq.backend.entrega.repository.LoteRepository;
