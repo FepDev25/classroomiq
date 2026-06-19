@@ -17,6 +17,7 @@ export const queryKeys = {
   entrega: (id: string) => ['entregas', id] as const,
 
   evaluacion: (entregaId: string) => ['entregas', entregaId, 'evaluacion'] as const,
+  contenidoEntrega: (entregaId: string) => ['entregas', entregaId, 'contenido'] as const,
   similitud: (loteId: string) => ['lotes', loteId, 'similitud'] as const,
   resumen: (loteId: string) => ['lotes', loteId, 'resumen'] as const,
 

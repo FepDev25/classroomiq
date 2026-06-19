@@ -7,6 +7,7 @@ type Materia = components['schemas']['MateriaResponse']
 type MetricasUso = components['schemas']['MetricasUsoResponse']
 type DocenteUsoDetalle = components['schemas']['DocenteUsoDetalleResponse']
 type ResumenGrupo = components['schemas']['ResumenGrupoResponse']
+type ContenidoEntrega = components['schemas']['ContenidoEntregaResponse']
 
 // Mismo baseUrl que el cliente en tests (vite.config → test.env.VITE_API_URL).
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
@@ -151,9 +152,35 @@ export const resumenGrupoFixture: ResumenGrupo = {
   narrativa: 'El grupo demostró dominio sólido en el modelo de datos.',
 }
 
+// --- Revisión · contenido de entrega (deuda del panel izquierdo)
+
+export const contenidoEntregaFixture: ContenidoEntrega = {
+  entregaId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
+  archivos: [
+    {
+      archivoId: 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+      nombreOriginal: 'informe.pdf',
+      rol: 'DOCUMENTO',
+      secciones: [
+        {
+          titulo: 'Introducción',
+          lenguaje: null,
+          lineaInicio: null,
+          lineaFin: null,
+          texto: 'El informe analiza el problema con rigor y propone una solución.',
+        },
+      ],
+    },
+  ],
+}
+
 export const handlers = [
   http.get(`${BASE}/api/materias`, () => HttpResponse.json(materiasFixture)),
   http.get(`${BASE}/api/lotes`, () => HttpResponse.json(lotesFixture)),
+
+  http.get(`${BASE}/api/entregas/:id/contenido`, () =>
+    HttpResponse.json(contenidoEntregaFixture),
+  ),
 
   http.get(`${BASE}/api/admin/metricas/uso`, () => HttpResponse.json(metricasUsoFixture)),
   http.get(`${BASE}/api/admin/metricas/uso/:docenteId`, () =>

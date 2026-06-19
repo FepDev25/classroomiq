@@ -1,9 +1,9 @@
 /**
- * Enlace cita → fragmento entre los dos paneles de la revisión. No hay texto
- * completo de la entrega en el backend (ver decisión de H4), así que la
- * "evidencia" del panel izquierdo son los fragmentos citados por el LLM,
- * agrupados por criterio. Cada fragmento tiene un id de DOM estable y los chips
- * de cita del panel derecho hacen scroll + destello hacia él.
+ * Enlace cita → evidencia entre los dos paneles de la revisión. El destino es el
+ * fragmento citado resaltado dentro del documento completo (`panel-documento`); o,
+ * como fallback cuando no hay contenido, el fragmento en la lista (`panel-entrega`).
+ * En ambos casos el destino lleva este id de DOM estable y los chips de cita del
+ * panel derecho hacen scroll + destello hacia él.
  */
 export function evidenciaDomId(criterioEvalId: string, indice: number): string {
   return `evidencia-${criterioEvalId}-${indice}`

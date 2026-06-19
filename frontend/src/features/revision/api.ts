@@ -8,10 +8,21 @@ export type NivelOpcion = components['schemas']['NivelOpcionResponse']
 export type Cita = components['schemas']['CitaResponse']
 export type CriterioRevisionRequest = components['schemas']['CriterioRevisionRequest']
 export type EstadoEvaluacion = components['schemas']['EstadoEvaluacion']
+export type ContenidoEntrega = components['schemas']['ContenidoEntregaResponse']
+export type ArchivoContenido = components['schemas']['ArchivoContenidoResponse']
+export type SeccionContenido = components['schemas']['SeccionContenidoResponse']
 
 export async function getBorrador(entregaId: string): Promise<Borrador> {
   const { data, error } = await api.GET('/api/entregas/{entregaId}/evaluacion', {
     params: { path: { entregaId } },
+  })
+  if (error) throw toApiError(error)
+  return data
+}
+
+export async function getContenido(entregaId: string): Promise<ContenidoEntrega> {
+  const { data, error } = await api.GET('/api/entregas/{id}/contenido', {
+    params: { path: { id: entregaId } },
   })
   if (error) throw toApiError(error)
   return data

@@ -4,6 +4,7 @@ import { queryKeys } from '@/api/queryKeys'
 import {
   aprobarEvaluacion,
   getBorrador,
+  getContenido,
   patchComentario,
   patchCriterio,
   type Borrador,
@@ -16,6 +17,19 @@ export function useBorrador(entregaId: string) {
     queryFn: () => getBorrador(entregaId),
     // El borrador no cambia solo; lo invalidamos nosotros tras cada edición.
     staleTime: Infinity,
+  })
+}
+
+/**
+ * Texto completo de la entrega para el panel de evidencia. El contenido es
+ * inmutable (la entrega no cambia tras indexarse), así que se cachea indefinido.
+ */
+export function useContenidoEntrega(entregaId: string) {
+  return useQuery({
+    queryKey: queryKeys.contenidoEntrega(entregaId),
+    queryFn: () => getContenido(entregaId),
+    staleTime: Infinity,
+    enabled: Boolean(entregaId),
   })
 }
 

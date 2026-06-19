@@ -9,11 +9,13 @@ import { useRubrica } from '@/features/rubricas/api'
 import {
   useAprobar,
   useBorrador,
+  useContenidoEntrega,
   usePatchComentario,
   usePatchCriterio,
 } from '@/features/revision/hooks'
 import { proyectarTotal } from '@/features/revision/total'
 import { PanelEntrega } from '@/features/revision/panel-entrega'
+import { PanelDocumento } from '@/features/revision/panel-documento'
 import { TarjetaCriterio } from '@/features/revision/tarjeta-criterio'
 import { EmptyState, ErrorState, LoadingRows } from '@/components/states'
 import { Badge } from '@/components/ui/badge'
@@ -38,6 +40,7 @@ function RevisionPage() {
   const { entregaId } = Route.useParams()
   const entrega = useEntrega(entregaId)
   const borrador = useBorrador(entregaId)
+  const contenido = useContenidoEntrega(entregaId)
   const rubrica = useRubrica(borrador.data?.rubricaId ?? '')
 
   const evaluacionId = borrador.data?.id ?? ''
@@ -171,8 +174,20 @@ function RevisionPage() {
       </p>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="lg:sticky lg:top-20 lg:self-start">
-          {entrega.data ? <PanelEntrega entrega={entrega.data} criterios={criterios} /> : null}
+        <div className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100svh-6rem)] lg:overflow-y-auto">
+          {entrega.data ? (
+            contenido.data && (contenido.data.archivos?.length ?? 0) > 0 ? (
+              // Documento completo con citas resaltadas en contexto.
+              <PanelDocumento
+                entrega={entrega.data}
+                contenido={contenido.data}
+                criterios={criterios}
+              />
+            ) : (
+              // Fallback: si no hay contenido (error/cargando/vacío), la lista de citas.
+              <PanelEntrega entrega={entrega.data} criterios={criterios} />
+            )
+          ) : null}
         </div>
 
         <div className="space-y-4">
