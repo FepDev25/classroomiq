@@ -4,6 +4,109 @@ Decisiones de diseño del backend de **classroomiq**, la plataforma de asistenci
 
 ---
 
+## 0. Arquitectura en un vistazo
+
+### Componentes y dependencias
+
+Una SPA habla con una única API Spring; el contenido sensible (archivos de entregas y embeddings) se queda en el servidor — **solo el LLM es cloud**. Los proveedores de LLM y embeddings son intercambiables (ver §7), así que el modo "nada sale del servidor" se logra cambiando configuración, no código.
+
+```mermaid
+flowchart LR
+    SPA["SPA React + TS<br/>TanStack · cliente generado de openapi.yaml"]
+
+    subgraph SRV["Servidor — publicado por Cloudflare Tunnel (fepdev.app)"]
+        API["API Spring Boot<br/>MVC + WebFlux/SSE · JWT · multi-tenant"]
+        DB[("PostgreSQL + pgvector<br/>esquema Flyway + embeddings vector(1024)")]
+        FS[("Almacenamiento local<br/>tenant/materia/lote/entrega")]
+    end
+
+    subgraph EXT["Proveedores intercambiables (config)"]
+        OLL["Ollama · bge-m3<br/>embeddings (local)"]
+        ANT["Anthropic API<br/>Sonnet 4.6 / Haiku 4.5"]
+    end
+
+    SPA -- "HTTPS · REST + SSE" --> API
+    API --> DB
+    API --> FS
+    API -- "embeddings (local)" --> OLL
+    API -- "evaluación / narrativa" --> ANT
+```
+
+### Modelo de datos
+
+Todas las tablas llevan `tenant_id` (omitido en el diagrama salvo en `usuario` para no saturarlo) — es el eje del aislamiento (§2). Dos rasgos del esquema encarnan el principio inamovible: `evaluacion_criterio` guarda lo **sugerido** (LLM) separado de lo **final** (docente), y `fragmento_entrega` persiste el `embedding vector(1024)` que alimenta el RAG (§6) y la similitud (§8).
+
+```mermaid
+erDiagram
+    INSTITUCION ||--o{ USUARIO : tenant
+    INSTITUCION ||--o{ MATERIA : tenant
+    USUARIO ||--o{ MATERIA : "docente dueño"
+    MATERIA ||--o{ RUBRICA : tiene
+    RUBRICA ||--o{ CRITERIO : tiene
+    CRITERIO ||--o{ NIVEL_DESEMPENO : tiene
+    MATERIA ||--o{ LOTE : tiene
+    RUBRICA ||--o{ LOTE : "se evalúa con"
+    LOTE ||--o{ ENTREGA : tiene
+    ENTREGA ||--o{ ARCHIVO_ENTREGA : tiene
+    ENTREGA ||--o{ FRAGMENTO_ENTREGA : chunks
+    ENTREGA ||--|| EVALUACION : tiene
+    RUBRICA ||--o{ EVALUACION : rubrica
+    EVALUACION ||--o{ EVALUACION_CRITERIO : "por criterio"
+    CRITERIO ||--o{ EVALUACION_CRITERIO : evaluado
+    EVALUACION_CRITERIO ||--o{ CITA_FRAGMENTO : cita
+    FRAGMENTO_ENTREGA ||--o{ CITA_FRAGMENTO : evidencia
+    LOTE ||--|| REPORTE_SIMILITUD : tiene
+    REPORTE_SIMILITUD ||--o{ PAR_SIMILITUD : pares
+    PAR_SIMILITUD ||--o{ FRAGMENTO_PAR_SIMILAR : fragmentos
+    LOTE ||--|| RESUMEN_GRUPO : "narrativa LLM"
+    USUARIO ||--o{ COORDINADOR_MATERIA : coordinador
+    MATERIA ||--o{ COORDINADOR_MATERIA : asignada
+    USUARIO ||--o{ REGISTRO_USO_LLM : docente
+
+    USUARIO {
+        uuid id PK
+        uuid tenant_id FK
+        string email UK
+        string rol "ADMIN | DOCENTE | COORDINADOR"
+        boolean activo
+    }
+    RUBRICA {
+        string modo_total "SUMA | PROMEDIO"
+    }
+    CRITERIO {
+        numeric puntaje_maximo
+        boolean evaluable_por_contenido
+    }
+    NIVEL_DESEMPENO {
+        string tipo_puntaje "RANGO | FIJO | BANDA_PCT"
+    }
+    ENTREGA {
+        string tipo "DOCUMENTO | CODIGO | MIXTA"
+        string estado "PENDIENTE / PROCESANDO / EVALUANDO / LISTO / ERROR"
+    }
+    FRAGMENTO_ENTREGA {
+        text contenido
+        vector embedding "dim 1024 · índice HNSW coseno"
+    }
+    EVALUACION {
+        string estado "BORRADOR | APROBADA"
+    }
+    EVALUACION_CRITERIO {
+        uuid nivel_sugerido_id "LLM"
+        numeric puntaje_sugerido "LLM"
+        uuid nivel_final_id "docente"
+        numeric puntaje_final "docente"
+    }
+    REGISTRO_USO_LLM {
+        string operacion "EVALUACION | NARRATIVA"
+        string modelo
+        bigint input_tokens
+        bigint output_tokens
+    }
+```
+
+---
+
 ## 1. El principio inamovible: asistente, no reemplazante
 
 > **El docente es el juez; la herramienta elimina el trabajo cognitivo repetitivo.**
@@ -19,6 +122,20 @@ arquitectura:
   - El motor LLM tiene **instrucciones inamovibles** (ver §6): citar evidencia textual, declarar explícitamente cuando el contenido es insuficiente en vez de inventar, no asignar puntajes fuera del rango del nivel, usar lenguaje objetivo y descriptivo.
   - Aprobar una evaluación **congela** sus valores (`APROBADA`); editarla después devuelve `409`.
   - El "botón de aprobar" no envía nada al estudiante — no hay portal estudiantil. El docente exporta y comunica por su canal habitual (Moodle, email, en clase).
+
+El ciclo de vida de una evaluación deja explícito ese congelamiento:
+
+```mermaid
+stateDiagram-v2
+    [*] --> BORRADOR : el motor genera el borrador
+    BORRADOR --> BORRADOR : el docente ajusta nivel / puntaje / justificación
+    BORRADOR --> APROBADA : aprobar (recalcula el total final)
+    APROBADA --> [*]
+    note right of APROBADA
+        Congelada — editar después devuelve 409.
+        El total final usa puntajeFinal ∥ puntajeSugerido por criterio.
+    end note
+```
 
 ---
 
@@ -50,6 +167,22 @@ Acceder a un recurso de otro tenant/docente responde `404`, indistinguible de "n
 ### El coordinador: visibilidad sin acceso operativo
 
 El coordinador es un rol de solo lectura sobre **reportes agregados** de las materias que el admin le asigna. Ve resúmenes por grupo y estadísticas por criterio — **nunca** trabajos individuales, evaluaciones específicas ni reportes de similitud (que revelan pares concretos de estudiantes). El acceso es por **asignación** (`coordinador_materia`), no por propiedad. Es la misma lógica de privacidad aplicada hacia arriba en la jerarquía: visibilidad institucional sin exposición de lo individual.
+
+### Roles y fronteras de un vistazo
+
+Tras el login, el `rol` del JWT decide el portal; cada rol tiene una frontera de lo que **nunca** ve:
+
+```mermaid
+flowchart TD
+    LOGIN["POST /api/auth/login"] --> JWT["JWT — sub · tenant_id · rol"]
+    JWT --> DISP{"rol"}
+    DISP -->|ADMIN| ADM["Portal admin<br/>cuentas · coordinadores · uso y costo"]
+    DISP -->|DOCENTE| DOC["materias · rúbricas · lotes<br/>revisión · similitud · resúmenes"]
+    DISP -->|COORDINADOR| COO["Reportes agregados<br/>solo lectura"]
+    ADM -. nunca .-> N1["contenido de entregas / evaluaciones"]
+    COO -. nunca .-> N2["trabajos individuales / similitud"]
+    DOC -. aislado de .-> N3["datos de otros docentes<br/>(tenant_id + docente_id)"]
+```
 
 ---
 
@@ -154,6 +287,65 @@ Procesar e indexar un lote es lento (extracción, embeddings, llamadas al LLM). 
 - **Procesamiento y evaluación en un executor dedicado** (`@Async`), disparados por endpoints que responden `202 Accepted` de inmediato.
 - **Indexado y evaluación son pasos explícitos y separados**, no auto-encadenados. El indexado (Fase 3) deja la entrega en `LISTO`; un endpoint distinto dispara la evaluación (`EVALUANDO`→`LISTO`). Separarlos da control al docente y evita gastar tokens automáticamente sobre entregas que quizás no se quieran evaluar aún.
 - **SSE para el estado en tiempo real:** `GET /api/lotes/{id}/eventos` emite el estado por entrega (`text/event-stream`). Se usa **WebFlux conviviendo con MVC** (la app corre como servlet; WebFlux solo aporta `Flux` + Reactor `Sinks` para el stream). La autorización ocurre **en el hilo del request** (valida tenant+docente, `404` si ajeno) y el stream se filtra por el `tenantId` capturado **por valor** — **sin ThreadLocal en el hilo reactivo**, sin queries en el hilo del stream. El ThreadLocal fail-closed es una garantía para las queries gestionadas, no para Reactor; mezclarlos sería un error de aislamiento.
+
+### El pipeline de extremo a extremo
+
+Procesar y evaluar son dos pasos explícitos; ambos responden `202` al instante y reportan progreso por SSE:
+
+```mermaid
+sequenceDiagram
+    actor D as Docente (SPA)
+    participant API as API (MVC)
+    participant W as Worker (@Async)
+    participant EMB as Ollama (bge-m3)
+    participant DB as pgvector
+    participant LLM as Anthropic (Sonnet)
+
+    Note over D,LLM: 1 · Procesar (indexado)
+    D->>API: POST /api/lotes/{id}/procesar
+    API-->>D: 202 Accepted
+    D->>API: GET /api/lotes/{id}/eventos (SSE)
+    API->>W: encola job (tenantId explícito)
+    W->>W: extracción → chunking (según tipo)
+    W->>EMB: embeddings de los chunks
+    EMB-->>W: vectores 1024 (L2)
+    W->>DB: persiste fragmentos
+    W-->>API: estado LISTO
+    API-->>D: evento SSE (LISTO)
+
+    Note over D,LLM: 2 · Evaluar (explícito, separado)
+    D->>API: POST /api/lotes/{id}/evaluar
+    API-->>D: 202 Accepted
+    API->>W: encola job (tenantId explícito)
+    loop por cada criterio evaluable
+        W->>EMB: embed(texto-consulta del criterio)
+        W->>DB: top-k fragmentos (similitud coseno)
+        W->>LLM: prompt (criterio + niveles + evidencia)
+        LLM-->>W: JSON (nivel, puntaje, justificación, citas)
+    end
+    W->>DB: guarda el borrador (valores sugeridos)
+    W-->>API: estado LISTO
+    API-->>D: evento SSE (LISTO)
+    D->>API: revisar → ajustar → aprobar (congela)
+```
+
+### Ciclo de vida de la entrega
+
+Los estados que viajan por el SSE. La evaluación es un paso aparte (no auto-encadenado); el lote sigue
+`LISTO` mientras corre — el progreso lo dan los eventos por entrega:
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDIENTE
+    PENDIENTE --> PROCESANDO : POST /procesar
+    PROCESANDO --> LISTO : indexado OK (fragmentos + embeddings)
+    PROCESANDO --> ERROR : fallo de extracción / embeddings
+    LISTO --> EVALUANDO : POST /evaluar
+    EVALUANDO --> LISTO : borrador generado
+    EVALUANDO --> ERROR : fallo del LLM
+    ERROR --> PROCESANDO : reintentar
+    note right of LISTO : cada transición se emite por SSE
+```
 
 ---
 

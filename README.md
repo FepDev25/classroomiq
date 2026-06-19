@@ -101,6 +101,34 @@ Decisiones de diseño y trade-offs: [`DESIGN.md`](DESIGN.md). Contrato de la API
 
 ---
 
+## Arquitectura
+
+Una SPA habla con una única API Spring. El contenido sensible —archivos de entregas y embeddings— se queda en el servidor; **solo el LLM es cloud**, y los proveedores de LLM/embeddings son intercambiables por configuración (el modo "nada sale del servidor" se logra sin tocar código). Más diagramas (modelo de datos, pipeline de evaluación, estados, roles) en [`DESIGN.md`](DESIGN.md).
+
+```mermaid
+flowchart LR
+    SPA["SPA React + TS<br/>TanStack · cliente generado de openapi.yaml"]
+
+    subgraph SRV["Servidor — publicado por Cloudflare Tunnel (fepdev.app)"]
+        API["API Spring Boot<br/>MVC + WebFlux/SSE · JWT · multi-tenant"]
+        DB[("PostgreSQL + pgvector<br/>esquema Flyway + embeddings vector(1024)")]
+        FS[("Almacenamiento local<br/>tenant/materia/lote/entrega")]
+    end
+
+    subgraph EXT["Proveedores intercambiables (config)"]
+        OLL["Ollama · bge-m3<br/>embeddings (local)"]
+        ANT["Anthropic API<br/>Sonnet 4.6 / Haiku 4.5"]
+    end
+
+    SPA -- "HTTPS · REST + SSE" --> API
+    API --> DB
+    API --> FS
+    API -- "embeddings (local)" --> OLL
+    API -- "evaluación / narrativa" --> ANT
+```
+
+---
+
 ## Despliegue
 
 ### Requisitos
