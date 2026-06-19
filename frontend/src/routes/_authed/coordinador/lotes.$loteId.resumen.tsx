@@ -42,7 +42,11 @@ function ResumenCoordinadorPage() {
           message="Se genera cuando el docente ha revisado y aprobado todas las entregas del lote."
         />
       ) : resumen.isError ? (
-        <ErrorState message="No pudimos cargar el resumen." onRetry={() => resumen.refetch()} />
+        <ErrorState
+          title="No pudimos cargar el resumen."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => resumen.refetch()}
+        />
       ) : (
         <ResumenGrupoView
           resumen={resumen.data}

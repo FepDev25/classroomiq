@@ -125,7 +125,11 @@ function RevisionPage() {
     return (
       <section className="space-y-6">
         <VolverAlLote loteId={entrega.data?.loteId} />
-        <ErrorState message="No pudimos cargar el borrador." onRetry={() => borrador.refetch()} />
+        <ErrorState
+          title="No pudimos cargar el borrador."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => borrador.refetch()}
+        />
       </section>
     )
   }
@@ -174,7 +178,7 @@ function RevisionPage() {
       </p>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100svh-6rem)] lg:overflow-y-auto">
+        <div className="lg:sticky lg:top-20 lg:max-h-[calc(100svh-6rem)] lg:self-start lg:overflow-y-auto">
           {entrega.data ? (
             contenido.data && (contenido.data.archivos?.length ?? 0) > 0 ? (
               // Documento completo con citas resaltadas en contexto.

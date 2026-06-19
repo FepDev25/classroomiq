@@ -203,7 +203,11 @@ function MateriasPage() {
       {isPending ? (
         <LoadingRows rows={5} />
       ) : isError ? (
-        <ErrorState message="Revisa tu conexión e inténtalo de nuevo." onRetry={() => refetch()} />
+        <ErrorState
+          title="No pudimos cargar las materias."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => refetch()}
+        />
       ) : materias.length === 0 ? (
         <EmptyState
           icon={<BookOpen className="size-8" />}

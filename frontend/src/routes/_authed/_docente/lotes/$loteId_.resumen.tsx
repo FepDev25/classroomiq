@@ -54,7 +54,11 @@ function ResumenPage() {
           message="Se genera cuando todas las entregas del lote están revisadas y aprobadas."
         />
       ) : resumen.isError ? (
-        <ErrorState message="No pudimos cargar el resumen." onRetry={() => resumen.refetch()} />
+        <ErrorState
+          title="No pudimos cargar el resumen."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => resumen.refetch()}
+        />
       ) : (
         <ResumenGrupoView
           resumen={resumen.data}

@@ -75,7 +75,8 @@ function MetricasPage() {
         <LoadingRows rows={5} />
       ) : metricas.isError ? (
         <ErrorState
-          message="No pudimos cargar las métricas del mes."
+          title="No pudimos cargar las métricas del mes."
+          message="Revisa tu conexión e inténtalo de nuevo."
           onRetry={() => metricas.refetch()}
         />
       ) : (
@@ -100,9 +101,18 @@ function MetricasPage() {
               valor={formatoMoneda(metricas.data.costoTotal, metricas.data.moneda)}
               detalle={`Umbral: ${formatoMoneda(metricas.data.umbralMensual, metricas.data.moneda)}`}
             />
-            <Metrica titulo="Tokens entrada" valor={formatoTokens(metricas.data.totalInputTokens)} />
-            <Metrica titulo="Tokens salida" valor={formatoTokens(metricas.data.totalOutputTokens)} />
-            <Metrica titulo="Docentes con uso" valor={String(metricas.data.docentes?.length ?? 0)} />
+            <Metrica
+              titulo="Tokens entrada"
+              valor={formatoTokens(metricas.data.totalInputTokens)}
+            />
+            <Metrica
+              titulo="Tokens salida"
+              valor={formatoTokens(metricas.data.totalOutputTokens)}
+            />
+            <Metrica
+              titulo="Docentes con uso"
+              valor={String(metricas.data.docentes?.length ?? 0)}
+            />
           </div>
 
           {(metricas.data.docentes?.length ?? 0) === 0 ? (
@@ -119,7 +129,7 @@ function MetricasPage() {
                 </CardContent>
               </Card>
 
-              <div className="border-border overflow-hidden rounded-lg border">
+              <div className="border-border overflow-x-auto rounded-lg border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -175,15 +185,7 @@ function MetricasPage() {
   )
 }
 
-function Metrica({
-  titulo,
-  valor,
-  detalle,
-}: {
-  titulo: string
-  valor: string
-  detalle?: string
-}) {
+function Metrica({ titulo, valor, detalle }: { titulo: string; valor: string; detalle?: string }) {
   return (
     <Card>
       <CardContent className="pt-6">

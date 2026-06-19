@@ -88,7 +88,11 @@ function LotesPage() {
       {isPending ? (
         <LoadingRows rows={5} />
       ) : isError ? (
-        <ErrorState message="Revisa tu conexión e inténtalo de nuevo." onRetry={() => refetch()} />
+        <ErrorState
+          title="No pudimos cargar los lotes."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => refetch()}
+        />
       ) : data.length === 0 ? (
         <EmptyState
           icon={<Boxes className="size-8" />}

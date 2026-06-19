@@ -75,6 +75,7 @@ function Home() {
         <LoadingRows rows={5} />
       ) : conError ? (
         <ErrorState
+          title="No pudimos cargar tu panel."
           message="Revisa tu conexión e inténtalo de nuevo."
           onRetry={() => {
             materias.refetch()

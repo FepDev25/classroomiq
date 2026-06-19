@@ -67,7 +67,11 @@ function MateriaDetallePage() {
           </div>
         ) : materia.isError ? (
           <div className="mt-4">
-            <ErrorState message="No pudimos cargar la materia." onRetry={() => materia.refetch()} />
+            <ErrorState
+              title="No pudimos cargar la materia."
+              message="Revisa tu conexión e inténtalo de nuevo."
+              onRetry={() => materia.refetch()}
+            />
           </div>
         ) : (
           <div className="mt-3 flex items-start justify-between gap-4">

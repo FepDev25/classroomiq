@@ -37,7 +37,11 @@ function LotesMateriaPage() {
       {lotes.isPending ? (
         <LoadingRows rows={4} />
       ) : lotes.isError ? (
-        <ErrorState message="No pudimos cargar los lotes." onRetry={() => lotes.refetch()} />
+        <ErrorState
+          title="No pudimos cargar los lotes."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => lotes.refetch()}
+        />
       ) : lotes.data.length === 0 ? (
         <EmptyState
           icon={<Layers className="size-8" />}

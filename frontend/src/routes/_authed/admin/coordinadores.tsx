@@ -52,7 +52,11 @@ function CoordinadoresPage() {
       {usuarios.isPending ? (
         <LoadingRows rows={4} />
       ) : usuarios.isError ? (
-        <ErrorState message="No pudimos cargar las cuentas." onRetry={() => usuarios.refetch()} />
+        <ErrorState
+          title="No pudimos cargar las cuentas."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => usuarios.refetch()}
+        />
       ) : coordinadores.length === 0 ? (
         <EmptyState
           icon={<UserCog className="size-8" />}
@@ -133,7 +137,9 @@ function AsignacionPanel({ coordinadorId }: { coordinadorId: string }) {
     desasignar.mutate(materiaId, {
       onSuccess: () => toast.success('Materia desasignada'),
       onError: (error: unknown) =>
-        toast.error(error instanceof ApiError ? error.message : 'No pudimos desasignar la materia.'),
+        toast.error(
+          error instanceof ApiError ? error.message : 'No pudimos desasignar la materia.',
+        ),
     })
   }
 
@@ -146,7 +152,11 @@ function AsignacionPanel({ coordinadorId }: { coordinadorId: string }) {
         {asignadas.isPending ? (
           <LoadingRows rows={2} />
         ) : asignadas.isError ? (
-          <ErrorState message="No pudimos cargar las asignaciones." onRetry={() => asignadas.refetch()} />
+          <ErrorState
+            title="No pudimos cargar las asignaciones."
+            message="Revisa tu conexión e inténtalo de nuevo."
+            onRetry={() => asignadas.refetch()}
+          />
         ) : (asignadas.data?.length ?? 0) === 0 ? (
           <EmptyState
             icon={<BookOpen className="size-7" />}
@@ -187,7 +197,11 @@ function AsignacionPanel({ coordinadorId }: { coordinadorId: string }) {
         {catalogo.isPending ? (
           <LoadingRows rows={2} />
         ) : catalogo.isError ? (
-          <ErrorState message="No pudimos cargar el catálogo." onRetry={() => catalogo.refetch()} />
+          <ErrorState
+            title="No pudimos cargar el catálogo."
+            message="Revisa tu conexión e inténtalo de nuevo."
+            onRetry={() => catalogo.refetch()}
+          />
         ) : !hayDisponibles ? (
           <p className="text-muted-foreground text-sm">
             No hay materias disponibles para asignar (todas ya están asignadas a este coordinador, o

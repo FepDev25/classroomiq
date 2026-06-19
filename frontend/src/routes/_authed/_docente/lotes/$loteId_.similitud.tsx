@@ -99,7 +99,11 @@ function SimilitudPage() {
           </div>
         </div>
       ) : reporte.isError ? (
-        <ErrorState message="No pudimos cargar el reporte." onRetry={() => reporte.refetch()} />
+        <ErrorState
+          title="No pudimos cargar el reporte."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => reporte.refetch()}
+        />
       ) : (
         <Reporte
           reporte={reporte.data}

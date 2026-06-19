@@ -148,7 +148,11 @@ function LoteDetallePage() {
           </div>
         ) : lote.isError ? (
           <div className="mt-4">
-            <ErrorState message="No pudimos cargar el lote." onRetry={() => lote.refetch()} />
+            <ErrorState
+              title="No pudimos cargar el lote."
+              message="Revisa tu conexión e inténtalo de nuevo."
+              onRetry={() => lote.refetch()}
+            />
           </div>
         ) : (
           <div className="mt-3 flex flex-wrap items-start justify-between gap-4">

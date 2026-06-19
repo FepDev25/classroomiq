@@ -25,7 +25,11 @@ function CoordinadorHome() {
       {materias.isPending ? (
         <LoadingRows rows={4} />
       ) : materias.isError ? (
-        <ErrorState message="No pudimos cargar tus materias." onRetry={() => materias.refetch()} />
+        <ErrorState
+          title="No pudimos cargar tus materias."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => materias.refetch()}
+        />
       ) : materias.data.length === 0 ? (
         <EmptyState
           icon={<BookOpen className="size-8" />}

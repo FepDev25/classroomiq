@@ -42,7 +42,9 @@ function CuentasPage() {
         onSuccess: (u) => toast.success(u.activo ? 'Cuenta activada' : 'Cuenta desactivada'),
         onError: (error: unknown) =>
           toast.error(
-            error instanceof ApiError ? error.message : 'No pudimos cambiar el estado de la cuenta.',
+            error instanceof ApiError
+              ? error.message
+              : 'No pudimos cambiar el estado de la cuenta.',
           ),
       },
     )
@@ -67,6 +69,7 @@ function CuentasPage() {
         <LoadingRows rows={5} />
       ) : usuarios.isError ? (
         <ErrorState
+          title="No pudimos cargar las cuentas."
           message="Revisa tu conexión e inténtalo de nuevo."
           onRetry={() => usuarios.refetch()}
         />
@@ -83,7 +86,7 @@ function CuentasPage() {
           }
         />
       ) : (
-        <div className="border-border overflow-hidden rounded-lg border">
+        <div className="border-border overflow-x-auto rounded-lg border">
           <Table>
             <TableHeader>
               <TableRow>

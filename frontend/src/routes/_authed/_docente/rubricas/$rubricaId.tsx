@@ -27,7 +27,11 @@ function EditarRubricaPage() {
   if (rubrica.isError || !rubrica.data.id) {
     return (
       <section className="mx-auto max-w-3xl">
-        <ErrorState message="No pudimos cargar la rúbrica." onRetry={() => rubrica.refetch()} />
+        <ErrorState
+          title="No pudimos cargar la rúbrica."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => rubrica.refetch()}
+        />
       </section>
     )
   }

@@ -43,7 +43,7 @@
   /* Voces semánticas del producto */
   --sugerido: #0e5a63; /* propuesto por el LLM */
   --sugerido-foreground: #f4fbfb;
-  --decision: #b26b2c; /* ajustado / decidido por el docente */
+  --decision: #9f5e22; /* ajustado / decidido por el docente — AA sobre fondos claros (≥4.5:1) */
   --decision-foreground: #fffaf3;
 
   /* Estados de procesamiento de entrega */

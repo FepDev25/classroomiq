@@ -35,7 +35,9 @@ export function DocenteDetalleDialog({
   return (
     <Dialog open={Boolean(docente)} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl">
-        {docente ? <DetalleContenido docenteId={docente.docenteId!} docente={docente} mes={mes} /> : null}
+        {docente ? (
+          <DetalleContenido docenteId={docente.docenteId!} docente={docente} mes={mes} />
+        ) : null}
       </DialogContent>
     </Dialog>
   )
@@ -65,13 +67,26 @@ function DetalleContenido({
       {detalle.isPending ? (
         <LoadingRows rows={4} />
       ) : detalle.isError ? (
-        <ErrorState message="No pudimos cargar el detalle." onRetry={() => detalle.refetch()} />
+        <ErrorState
+          title="No pudimos cargar el detalle."
+          message="Revisa tu conexión e inténtalo de nuevo."
+          onRetry={() => detalle.refetch()}
+        />
       ) : (
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-3 text-sm">
-            <Resumen etiqueta="Costo total" valor={formatoMoneda(detalle.data.costoTotal, detalle.data.moneda)} />
-            <Resumen etiqueta="Tokens entrada" valor={formatoTokens(detalle.data.totalInputTokens)} />
-            <Resumen etiqueta="Tokens salida" valor={formatoTokens(detalle.data.totalOutputTokens)} />
+            <Resumen
+              etiqueta="Costo total"
+              valor={formatoMoneda(detalle.data.costoTotal, detalle.data.moneda)}
+            />
+            <Resumen
+              etiqueta="Tokens entrada"
+              valor={formatoTokens(detalle.data.totalInputTokens)}
+            />
+            <Resumen
+              etiqueta="Tokens salida"
+              valor={formatoTokens(detalle.data.totalOutputTokens)}
+            />
           </div>
 
           <Seccion titulo="Por modelo">
@@ -88,8 +103,12 @@ function DetalleContenido({
                 {(detalle.data.porModelo ?? []).map((m) => (
                   <TableRow key={m.modelo}>
                     <TableCell className="font-medium">{m.modelo}</TableCell>
-                    <TableCell className="text-right tabular-nums">{formatoTokens(m.inputTokens)}</TableCell>
-                    <TableCell className="text-right tabular-nums">{formatoTokens(m.outputTokens)}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatoTokens(m.inputTokens)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatoTokens(m.outputTokens)}
+                    </TableCell>
                     <TableCell className="text-right tabular-nums">
                       {formatoMoneda(m.costoEstimado, detalle.data.moneda)}
                     </TableCell>
@@ -115,8 +134,12 @@ function DetalleContenido({
                     <TableCell className="font-medium">
                       {o.operacion ? OPERACION_LABEL[o.operacion] : '—'}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums">{formatoTokens(o.inputTokens)}</TableCell>
-                    <TableCell className="text-right tabular-nums">{formatoTokens(o.outputTokens)}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatoTokens(o.inputTokens)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatoTokens(o.outputTokens)}
+                    </TableCell>
                     <TableCell className="text-right tabular-nums">
                       {formatoMoneda(o.costoEstimado, detalle.data.moneda)}
                     </TableCell>
