@@ -15,7 +15,11 @@ export function useMaterias() {
 }
 
 export function useMateria(id: string) {
-  return useQuery({ queryKey: queryKeys.materia(id), queryFn: () => getMateria(id) })
+  return useQuery({
+    queryKey: queryKeys.materia(id),
+    queryFn: () => getMateria(id),
+    enabled: Boolean(id),
+  })
 }
 
 export function useCrearMateria() {

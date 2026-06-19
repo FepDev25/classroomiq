@@ -99,7 +99,12 @@ function MateriasPage() {
         cell: (info) => {
           const materia = info.row.original
           return (
-            <div className="flex items-center justify-end gap-1">
+            // Detiene la propagación para que ni el menú ni el "ghost click"
+            // que Radix emite al cerrarse disparen la navegación de la fila.
+            <div
+              className="flex items-center justify-end gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
               {!materia.archivada ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -243,12 +248,13 @@ function MateriasPage() {
                 <TableRow
                   key={row.id}
                   className="hover:bg-muted/50 cursor-pointer"
-                  onClick={() =>
+                  onClick={() => {
+                    if (!row.original.id) return
                     navigate({
                       to: '/materias/$materiaId',
-                      params: { materiaId: row.original.id ?? '' },
+                      params: { materiaId: row.original.id },
                     })
-                  }
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

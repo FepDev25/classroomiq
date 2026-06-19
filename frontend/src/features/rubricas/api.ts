@@ -51,11 +51,16 @@ export function useRubricas(materiaId: string) {
   return useQuery({
     queryKey: queryKeys.rubricas(materiaId),
     queryFn: () => listRubricas(materiaId),
+    enabled: Boolean(materiaId),
   })
 }
 
 export function useRubrica(id: string) {
-  return useQuery({ queryKey: queryKeys.rubrica(id), queryFn: () => getRubrica(id) })
+  return useQuery({
+    queryKey: queryKeys.rubrica(id),
+    queryFn: () => getRubrica(id),
+    enabled: Boolean(id),
+  })
 }
 
 export function useCrearRubrica(materiaId: string) {

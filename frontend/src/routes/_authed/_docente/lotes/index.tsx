@@ -119,9 +119,10 @@ function LotesPage() {
                 <TableRow
                   key={lote.id}
                   className="hover:bg-muted/50 cursor-pointer"
-                  onClick={() =>
-                    navigate({ to: '/lotes/$loteId', params: { loteId: lote.id ?? '' } })
-                  }
+                  onClick={() => {
+                    if (!lote.id) return
+                    navigate({ to: '/lotes/$loteId', params: { loteId: lote.id } })
+                  }}
                 >
                   <TableCell>
                     <Link
@@ -139,7 +140,10 @@ function LotesPage() {
                     {lote.estado ? <EstadoLoteBadge estado={lote.estado} /> : null}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-end gap-1">
+                    <div
+                      className="flex items-center justify-end gap-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
