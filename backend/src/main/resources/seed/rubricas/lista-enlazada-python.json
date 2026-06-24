@@ -1,0 +1,57 @@
+{
+  "nombre": "Tarea: Implementación de una Lista Enlazada (Python)",
+  "materia": "Estructuras de Datos",
+  "descripcion": "Tarea de programación pura (entrega tipo CÓDIGO): implementar una lista enlazada simple en Python con inserción en ambos extremos, eliminación por valor y búsqueda, junto con sus pruebas automatizadas y documentación de uso. El total es la suma de los criterios.",
+  "puntajeTotal": 20,
+  "modoTotal": "suma",
+  "criterios": [
+    {
+      "nombre": "Correctitud de la implementación",
+      "descripcion": "La lista enlazada implementa correctamente insertar_inicio, insertar_final, eliminar (primera aparición de un valor), buscar, tamano y esta_vacia. Mantiene la integridad de los enlaces y resuelve los casos de borde: lista vacía, eliminar la cabeza, eliminar la cola (actualizando la referencia al final) y eliminar un valor inexistente sin romper la lista.",
+      "puntajeMaximo": 8,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 7, "max": 8, "descripcion": "Todas las operaciones son correctas y todos los casos de borde (lista vacía, cabeza, cola e inexistente) se resuelven sin romper los enlaces. Integridad impecable." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 5, "max": 6, "descripcion": "Operaciones correctas pero el manejo de algún caso de borde es parcial (p. ej. no actualiza la referencia a la cola al eliminar el último, o eliminar un inexistente no devuelve un resultado limpio)." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 3, "max": 4, "descripcion": "La estructura funciona en el caso feliz pero falta alguna operación o no contempla eliminar la cabeza ni la lista vacía." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 2, "descripcion": "Implementación incompleta o con errores que rompen la integridad de los enlaces (pierde nodos o deja referencias colgantes)." }
+      ]
+    },
+    {
+      "nombre": "Pruebas automatizadas",
+      "descripcion": "Existen pruebas (unittest o pytest) que cubren las operaciones principales y al menos un caso de borde (eliminar la cabeza, eliminar un inexistente u operar sobre una lista vacía). Las pruebas son ejecutables y verifican comportamiento, no solo que el código no falle.",
+      "puntajeMaximo": 5,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 5, "max": 5, "descripcion": "Pruebas claras que cubren operaciones normales y casos de borde (eliminar cabeza, cola e inexistente, lista vacía)." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 4, "max": 4, "descripcion": "Pruebas de las operaciones principales pero sin cubrir casos de borde." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 2, "max": 3, "descripcion": "Pruebas mínimas o superficiales (uno o dos asserts)." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 1, "descripcion": "Sin pruebas o no ejecutables." }
+      ]
+    },
+    {
+      "nombre": "Calidad de código",
+      "descripcion": "Nombres descriptivos, docstrings en la clase y métodos públicos, el nodo y la lista separados de forma razonable, y ausencia de código muerto o duplicado.",
+      "puntajeMaximo": 4,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 4, "max": 4, "descripcion": "Código limpio, bien nombrado, documentado y modular." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 3, "max": 3, "descripcion": "Código legible con documentación parcial o estructura única razonable." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 2, "max": 2, "descripcion": "Funciona pero con nombres pobres, sin docstrings o con código mezclado." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 1, "descripcion": "Código desordenado, sin estructura ni documentación." }
+      ]
+    },
+    {
+      "nombre": "Documentación de uso (README)",
+      "descripcion": "Incluye un README que explica qué hace el proyecto, cómo ejecutarlo y cómo correr las pruebas, con un ejemplo mínimo de uso.",
+      "puntajeMaximo": 3,
+      "evaluablePorContenido": true,
+      "niveles": [
+        { "nombre": "Excelente", "tipoPuntaje": "rango", "min": 3, "max": 3, "descripcion": "README completo: descripción, ejecución, pruebas y ejemplo de uso." },
+        { "nombre": "Bueno", "tipoPuntaje": "rango", "min": 2, "max": 2, "descripcion": "README presente pero incompleto (falta el ejemplo o cómo correr pruebas)." },
+        { "nombre": "Básico", "tipoPuntaje": "rango", "min": 1, "max": 1, "descripcion": "README mínimo de una o dos líneas." },
+        { "nombre": "Insuficiente", "tipoPuntaje": "rango", "min": 0, "max": 0, "descripcion": "Sin README." }
+      ]
+    }
+  ]
+}
