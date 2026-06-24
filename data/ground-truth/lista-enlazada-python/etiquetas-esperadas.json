@@ -1,0 +1,204 @@
+{
+  "rubrica": "rubrica.json",
+  "descripcion": "Ground truth de CÓDIGO para la demo de LinkedIn: nivel y puntaje esperado por criterio para 15 entregas ficticias de una lista enlazada simple en Python. Cada entrega es un directorio de archivos fuente que se sube como una entrega tipo CODIGO (comprimida en .zip; ver carpeta zips/). Pensado para mostrar cómo la herramienta acelera la revisión de un lote grande manteniendo el criterio del docente. Tolerancia: ±1 nivel; el puntaje debe caer dentro del rango del nivel esperado.",
+  "tipoEntrega": "CODIGO",
+  "toleranciaNivel": 1,
+  "notaSimilitud": "Las entregas 11 (karina-lucero) y 15 (paula-herrera) son gemelas semánticas: implementan la misma lógica con identificadores y comentarios distintos (Nodo/cabeza/cola/dato vs Celda/primero/ultimo/valor). Sirven para demostrar la detección de similitud semántica (alta similitud pese a compartir poco texto), siempre como alerta para revisión manual, nunca como acusación.",
+  "entregas": [
+    {
+      "archivo": "entrega-01-excelente/",
+      "zip": "zips/01-ana-torres.zip",
+      "estudiante": "Ana Torres",
+      "perfil": "Implementación completa y limpia: cabeza, cola y contador en O(1), todos los casos de borde resueltos (vacía, cabeza, cola, inexistente), pruebas con bordes y README completo.",
+      "totalEsperado": 20,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Excelente", "puntajeEsperado": 8 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Excelente", "puntajeEsperado": 5 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Excelente", "puntajeEsperado": 4 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Excelente", "puntajeEsperado": 3 }
+      ]
+    },
+    {
+      "archivo": "entrega-02-excelente/",
+      "zip": "zips/02-bruno-mendez.zip",
+      "estudiante": "Bruno Méndez",
+      "perfil": "Operaciones y casos de borde correctos (recorre para insertar al final, sin puntero a la cola), pruebas con bordes y README completo; código correcto pero con el nodo público y sin encapsular.",
+      "totalEsperado": 19,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Excelente", "puntajeEsperado": 8 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Excelente", "puntajeEsperado": 5 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Bueno", "puntajeEsperado": 3 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Excelente", "puntajeEsperado": 3 }
+      ]
+    },
+    {
+      "archivo": "entrega-12-excelente/",
+      "zip": "zips/12-luis-bravo.zip",
+      "estudiante": "Luis Bravo",
+      "perfil": "Operaciones correctas con manejo de cabeza y cola; pruebas con bordes; código legible; README mínimo (solo cómo correr las pruebas, sin ejemplo de uso).",
+      "totalEsperado": 18,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Excelente", "puntajeEsperado": 7 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Excelente", "puntajeEsperado": 5 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Excelente", "puntajeEsperado": 4 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Bueno", "puntajeEsperado": 2 }
+      ]
+    },
+    {
+      "archivo": "entrega-03-bueno/",
+      "zip": "zips/03-carla-rios.zip",
+      "estudiante": "Carla Ríos",
+      "perfil": "Operaciones correctas pero manejo de borde parcial: eliminar un valor inexistente lanza ValueError en vez de devolver un resultado limpio. Pruebas de operaciones principales sin bordes; README completo.",
+      "totalEsperado": 16,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Bueno", "puntajeEsperado": 6 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Bueno", "puntajeEsperado": 4 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Bueno", "puntajeEsperado": 3 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Excelente", "puntajeEsperado": 3 }
+      ]
+    },
+    {
+      "archivo": "entrega-15-bueno/",
+      "zip": "zips/15-paula-herrera.zip",
+      "estudiante": "Paula Herrera",
+      "perfil": "Gemela semántica de la 11 (karina-lucero). Operaciones correctas pero no actualiza la referencia al último al eliminar la cola (insertar después pierde el elemento). Pruebas de operaciones principales sin bordes; README completo.",
+      "totalEsperado": 16,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Bueno", "puntajeEsperado": 6 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Bueno", "puntajeEsperado": 4 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Bueno", "puntajeEsperado": 3 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Excelente", "puntajeEsperado": 3 }
+      ]
+    },
+    {
+      "archivo": "entrega-04-bueno/",
+      "zip": "zips/04-diego-fuentes.zip",
+      "estudiante": "Diego Fuentes",
+      "perfil": "Operaciones correctas pero manejo de borde parcial: no actualiza la cola al eliminar el último y eliminar no devuelve un booleano. Pruebas de operaciones principales; README incompleto (sin ejemplo de uso).",
+      "totalEsperado": 15,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Bueno", "puntajeEsperado": 6 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Bueno", "puntajeEsperado": 4 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Bueno", "puntajeEsperado": 3 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Bueno", "puntajeEsperado": 2 }
+      ]
+    },
+    {
+      "archivo": "entrega-11-bueno/",
+      "zip": "zips/11-karina-lucero.zip",
+      "estudiante": "Karina Lucero",
+      "perfil": "Gemela semántica de la 15 (paula-herrera). Operaciones correctas pero no actualiza la referencia a la cola al eliminar el último (insertar después pierde el elemento). Pruebas de operaciones principales; README incompleto (sin instrucciones de pruebas).",
+      "totalEsperado": 15,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Bueno", "puntajeEsperado": 6 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Bueno", "puntajeEsperado": 4 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Bueno", "puntajeEsperado": 3 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Bueno", "puntajeEsperado": 2 }
+      ]
+    },
+    {
+      "archivo": "entrega-05-bueno/",
+      "zip": "zips/05-elena-paredes.zip",
+      "estudiante": "Elena Paredes",
+      "perfil": "Operaciones correctas pero código de baja calidad: nombres de una letra (h, x, n), sin docstrings; eliminar sobre lista vacía no informa nada. Pruebas de operaciones principales; README incompleto.",
+      "totalEsperado": 14,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Bueno", "puntajeEsperado": 6 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Bueno", "puntajeEsperado": 4 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Bueno", "puntajeEsperado": 2 }
+      ]
+    },
+    {
+      "archivo": "entrega-06-basico/",
+      "zip": "zips/06-fabian-soto.zip",
+      "estudiante": "Fabián Soto",
+      "perfil": "Funciona en el caso feliz pero falta la operación buscar. Pruebas mínimas (un par de casos); código sin docstrings; README breve presente.",
+      "totalEsperado": 11,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Básico", "puntajeEsperado": 4 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Básico", "puntajeEsperado": 3 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Bueno", "puntajeEsperado": 2 }
+      ]
+    },
+    {
+      "archivo": "entrega-13-basico/",
+      "zip": "zips/13-maria-salas.zip",
+      "estudiante": "María Salas",
+      "perfil": "Operaciones presentes pero eliminar no contempla la cabeza (al borrar el primer valor elimina el segundo y deja la cabeza). Pruebas mínimas; README breve presente.",
+      "totalEsperado": 10,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Básico", "puntajeEsperado": 4 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Bueno", "puntajeEsperado": 2 }
+      ]
+    },
+    {
+      "archivo": "entrega-07-basico/",
+      "zip": "zips/07-gabriela-nunez.zip",
+      "estudiante": "Gabriela Núñez",
+      "perfil": "Caso feliz funcional pero faltan operaciones (sin esta_vacia, tamano ni insertar_inicio). Pruebas mínimas (un assert); README de una línea.",
+      "totalEsperado": 9,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Básico", "puntajeEsperado": 4 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Básico", "puntajeEsperado": 1 }
+      ]
+    },
+    {
+      "archivo": "entrega-08-basico/",
+      "zip": "zips/08-hugo-ramirez.zip",
+      "estudiante": "Hugo Ramírez",
+      "perfil": "Caso feliz funcional pero faltan operaciones (sin buscar ni tamano). Pruebas mínimas (un assert); sin README.",
+      "totalEsperado": 8,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Básico", "puntajeEsperado": 4 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 }
+      ]
+    },
+    {
+      "archivo": "entrega-09-insuficiente/",
+      "zip": "zips/09-ines-cardenas.zip",
+      "estudiante": "Inés Cárdenas",
+      "perfil": "Errores que rompen la semántica: insertar_final inserta en realidad al inicio, eliminar borra la cabeza sin importar el valor y buscar solo mira el primer nodo. Pruebas no ejecutables (importan un módulo inexistente). README de una línea.",
+      "totalEsperado": 6,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Insuficiente", "puntajeEsperado": 2 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Insuficiente", "puntajeEsperado": 1 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Básico", "puntajeEsperado": 2 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Básico", "puntajeEsperado": 1 }
+      ]
+    },
+    {
+      "archivo": "entrega-14-insuficiente/",
+      "zip": "zips/14-nicolas-vega.zip",
+      "estudiante": "Nicolás Vega",
+      "perfil": "Implementación incompleta: solo insertar al inicio y un eliminar roto que no desenlaza nada; faltan buscar, tamano, esta_vacia e insertar_final. Sin pruebas; README de una línea.",
+      "totalEsperado": 4,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Insuficiente", "puntajeEsperado": 2 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Insuficiente", "puntajeEsperado": 1 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Básico", "puntajeEsperado": 1 }
+      ]
+    },
+    {
+      "archivo": "entrega-10-insuficiente/",
+      "zip": "zips/10-javier-ortega.zip",
+      "estudiante": "Javier Ortega",
+      "perfil": "No es una lista enlazada: agregar reemplaza el único dato (pierde lo anterior), quitar borra todo y el nodo no tiene enlace al siguiente. Sin pruebas ni README.",
+      "totalEsperado": 3,
+      "criterios": [
+        { "criterio": "Correctitud de la implementación", "nivelEsperado": "Insuficiente", "puntajeEsperado": 2 },
+        { "criterio": "Pruebas automatizadas", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 },
+        { "criterio": "Calidad de código", "nivelEsperado": "Insuficiente", "puntajeEsperado": 1 },
+        { "criterio": "Documentación de uso (README)", "nivelEsperado": "Insuficiente", "puntajeEsperado": 0 }
+      ]
+    }
+  ]
+}

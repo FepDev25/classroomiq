@@ -1,0 +1,1527 @@
+===FILE=== entrega-01-excelente/lista_enlazada.py
+"""Lista enlazada simple (singly linked list) en Python puro."""
+
+
+class _Nodo:
+    """Nodo interno: guarda un valor y la referencia al siguiente nodo."""
+
+    __slots__ = ("valor", "siguiente")
+
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    """Lista enlazada simple.
+
+    Mantiene referencias a la cabeza y a la cola para insertar en O(1) en ambos
+    extremos, y un contador para responder ``tamano`` en O(1). Conserva la
+    integridad de los enlaces en todos los casos de borde.
+    """
+
+    def __init__(self):
+        self._cabeza = None
+        self._cola = None
+        self._tamano = 0
+
+    def esta_vacia(self):
+        """Indica si la lista no tiene elementos."""
+        return self._cabeza is None
+
+    def tamano(self):
+        """Cantidad de elementos en la lista."""
+        return self._tamano
+
+    def insertar_inicio(self, valor):
+        """Inserta un elemento al principio de la lista."""
+        nodo = _Nodo(valor)
+        nodo.siguiente = self._cabeza
+        self._cabeza = nodo
+        if self._cola is None:
+            self._cola = nodo
+        self._tamano += 1
+
+    def insertar_final(self, valor):
+        """Inserta un elemento al final de la lista."""
+        nodo = _Nodo(valor)
+        if self._cola is None:
+            self._cabeza = self._cola = nodo
+        else:
+            self._cola.siguiente = nodo
+            self._cola = nodo
+        self._tamano += 1
+
+    def buscar(self, valor):
+        """Devuelve True si el valor está en la lista."""
+        actual = self._cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                return True
+            actual = actual.siguiente
+        return False
+
+    def eliminar(self, valor):
+        """Elimina la primera aparición de un valor.
+
+        Devuelve True si se eliminó, False si el valor no estaba. Actualiza la
+        cabeza y la cola cuando corresponde para no dejar referencias colgantes.
+        """
+        anterior = None
+        actual = self._cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                if anterior is None:
+                    self._cabeza = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                if actual is self._cola:
+                    self._cola = anterior
+                self._tamano -= 1
+                return True
+            anterior = actual
+            actual = actual.siguiente
+        return False
+
+    def a_lista(self):
+        """Devuelve los elementos como una lista de Python, de la cabeza a la cola."""
+        return list(self)
+
+    def __iter__(self):
+        actual = self._cabeza
+        while actual is not None:
+            yield actual.valor
+            actual = actual.siguiente
+
+    def __len__(self):
+        return self._tamano
+===FILE=== entrega-01-excelente/test_lista_enlazada.py
+"""Pruebas de ListaEnlazada, incluyendo casos de borde."""
+
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def setUp(self):
+        self.lista = ListaEnlazada()
+
+    def test_lista_nueva_esta_vacia(self):
+        self.assertTrue(self.lista.esta_vacia())
+        self.assertEqual(self.lista.tamano(), 0)
+
+    def test_insertar_final_mantiene_orden(self):
+        for v in (1, 2, 3):
+            self.lista.insertar_final(v)
+        self.assertEqual(self.lista.a_lista(), [1, 2, 3])
+
+    def test_insertar_inicio_invierte_orden(self):
+        for v in (1, 2, 3):
+            self.lista.insertar_inicio(v)
+        self.assertEqual(self.lista.a_lista(), [3, 2, 1])
+
+    def test_buscar_encuentra_y_no_encuentra(self):
+        self.lista.insertar_final("a")
+        self.assertTrue(self.lista.buscar("a"))
+        self.assertFalse(self.lista.buscar("z"))
+
+    def test_eliminar_cabeza(self):
+        for v in (1, 2, 3):
+            self.lista.insertar_final(v)
+        self.assertTrue(self.lista.eliminar(1))
+        self.assertEqual(self.lista.a_lista(), [2, 3])
+
+    def test_eliminar_cola_actualiza_referencia(self):
+        for v in (1, 2, 3):
+            self.lista.insertar_final(v)
+        self.assertTrue(self.lista.eliminar(3))
+        self.lista.insertar_final(4)
+        self.assertEqual(self.lista.a_lista(), [1, 2, 4])
+
+    def test_eliminar_inexistente_devuelve_false(self):
+        self.lista.insertar_final(1)
+        self.assertFalse(self.lista.eliminar(99))
+        self.assertEqual(self.lista.tamano(), 1)
+
+    def test_eliminar_en_lista_vacia_devuelve_false(self):
+        self.assertFalse(self.lista.eliminar(1))
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-01-excelente/README.md
+# Lista Enlazada Simple (Python)
+
+Implementación de una lista enlazada simple con inserción en ambos extremos,
+eliminación por valor y búsqueda. No requiere dependencias externas (solo la
+librería estándar).
+
+## Uso
+
+```python
+from lista_enlazada import ListaEnlazada
+
+lista = ListaEnlazada()
+lista.insertar_final(1)
+lista.insertar_final(2)
+lista.insertar_inicio(0)
+print(lista.a_lista())   # [0, 1, 2]
+print(lista.buscar(2))   # True
+lista.eliminar(1)
+print(lista.a_lista())   # [0, 2]
+```
+
+## Pruebas
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+
+Las pruebas cubren las operaciones principales y los casos de borde: eliminar la
+cabeza, eliminar la cola (verificando que la referencia al final se actualiza),
+eliminar un valor inexistente y operar sobre una lista vacía.
+===FILE=== entrega-02-excelente/lista_enlazada.py
+"""Lista enlazada simple en Python."""
+
+
+class Nodo:
+    """Nodo de la lista: un valor y el enlace al siguiente nodo."""
+
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    """Lista enlazada simple con inserción, eliminación y búsqueda por valor."""
+
+    def __init__(self):
+        self.cabeza = None
+
+    def esta_vacia(self):
+        """Indica si la lista no tiene elementos."""
+        return self.cabeza is None
+
+    def tamano(self):
+        """Cuenta los elementos recorriendo la lista."""
+        total = 0
+        actual = self.cabeza
+        while actual is not None:
+            total += 1
+            actual = actual.siguiente
+        return total
+
+    def insertar_inicio(self, valor):
+        """Inserta un elemento al principio."""
+        nodo = Nodo(valor)
+        nodo.siguiente = self.cabeza
+        self.cabeza = nodo
+
+    def insertar_final(self, valor):
+        """Inserta un elemento al final recorriendo hasta el último nodo."""
+        nodo = Nodo(valor)
+        if self.cabeza is None:
+            self.cabeza = nodo
+            return
+        actual = self.cabeza
+        while actual.siguiente is not None:
+            actual = actual.siguiente
+        actual.siguiente = nodo
+
+    def buscar(self, valor):
+        """Devuelve True si el valor está en la lista."""
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                return True
+            actual = actual.siguiente
+        return False
+
+    def eliminar(self, valor):
+        """Elimina la primera aparición del valor. Devuelve True si lo encontró."""
+        anterior = None
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                if anterior is None:
+                    self.cabeza = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                return True
+            anterior = actual
+            actual = actual.siguiente
+        return False
+
+    def a_lista(self):
+        """Devuelve los elementos en una lista de Python."""
+        salida = []
+        actual = self.cabeza
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-02-excelente/test_lista_enlazada.py
+"""Pruebas de la lista enlazada."""
+
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def setUp(self):
+        self.lista = ListaEnlazada()
+
+    def test_nueva_vacia(self):
+        self.assertTrue(self.lista.esta_vacia())
+        self.assertEqual(self.lista.tamano(), 0)
+
+    def test_insertar_final(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertEqual(self.lista.a_lista(), [1, 2])
+
+    def test_insertar_inicio(self):
+        self.lista.insertar_inicio(1)
+        self.lista.insertar_inicio(2)
+        self.assertEqual(self.lista.a_lista(), [2, 1])
+
+    def test_buscar(self):
+        self.lista.insertar_final(5)
+        self.assertTrue(self.lista.buscar(5))
+        self.assertFalse(self.lista.buscar(6))
+
+    def test_eliminar_cabeza(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertTrue(self.lista.eliminar(1))
+        self.assertEqual(self.lista.a_lista(), [2])
+
+    def test_eliminar_intermedio(self):
+        for v in (1, 2, 3):
+            self.lista.insertar_final(v)
+        self.assertTrue(self.lista.eliminar(2))
+        self.assertEqual(self.lista.a_lista(), [1, 3])
+
+    def test_eliminar_inexistente(self):
+        self.lista.insertar_final(1)
+        self.assertFalse(self.lista.eliminar(9))
+
+    def test_eliminar_vacia(self):
+        self.assertFalse(self.lista.eliminar(1))
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-02-excelente/README.md
+# Lista Enlazada Simple
+
+Lista enlazada simple en Python con inserción al inicio y al final, búsqueda y
+eliminación por valor.
+
+## Ejemplo de uso
+
+```python
+from lista_enlazada import ListaEnlazada
+
+lista = ListaEnlazada()
+lista.insertar_final("a")
+lista.insertar_final("b")
+print(lista.a_lista())  # ['a', 'b']
+lista.eliminar("a")
+print(lista.a_lista())  # ['b']
+```
+
+## Cómo correr las pruebas
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+===FILE=== entrega-12-excelente/lista_enlazada.py
+"""Implementacion de una lista enlazada simple."""
+
+
+class Nodo:
+    """Nodo con un valor y referencia al siguiente."""
+
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    """Lista enlazada simple con cabeza, cola y contador."""
+
+    def __init__(self):
+        self.cabeza = None
+        self.cola = None
+        self.cantidad = 0
+
+    def esta_vacia(self):
+        return self.cabeza is None
+
+    def tamano(self):
+        return self.cantidad
+
+    def insertar_inicio(self, valor):
+        """Agrega un valor al inicio de la lista."""
+        nodo = Nodo(valor)
+        nodo.siguiente = self.cabeza
+        self.cabeza = nodo
+        if self.cola is None:
+            self.cola = nodo
+        self.cantidad += 1
+
+    def insertar_final(self, valor):
+        """Agrega un valor al final de la lista."""
+        nodo = Nodo(valor)
+        if self.cabeza is None:
+            self.cabeza = nodo
+            self.cola = nodo
+        else:
+            self.cola.siguiente = nodo
+            self.cola = nodo
+        self.cantidad += 1
+
+    def buscar(self, valor):
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                return True
+            actual = actual.siguiente
+        return False
+
+    def eliminar(self, valor):
+        """Elimina la primera aparicion del valor, devuelve True/False."""
+        anterior = None
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                if anterior is None:
+                    self.cabeza = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                if actual is self.cola:
+                    self.cola = anterior
+                self.cantidad -= 1
+                return True
+            anterior = actual
+            actual = actual.siguiente
+        return False
+
+    def a_lista(self):
+        salida = []
+        actual = self.cabeza
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-12-excelente/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def setUp(self):
+        self.lista = ListaEnlazada()
+
+    def test_vacia(self):
+        self.assertTrue(self.lista.esta_vacia())
+
+    def test_insertar_y_orden(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.lista.insertar_inicio(0)
+        self.assertEqual(self.lista.a_lista(), [0, 1, 2])
+
+    def test_buscar(self):
+        self.lista.insertar_final(1)
+        self.assertTrue(self.lista.buscar(1))
+        self.assertFalse(self.lista.buscar(2))
+
+    def test_eliminar_cabeza(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertTrue(self.lista.eliminar(1))
+        self.assertEqual(self.lista.a_lista(), [2])
+
+    def test_eliminar_cola(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertTrue(self.lista.eliminar(2))
+        self.lista.insertar_final(3)
+        self.assertEqual(self.lista.a_lista(), [1, 3])
+
+    def test_eliminar_inexistente(self):
+        self.assertFalse(self.lista.eliminar(7))
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-12-excelente/README.md
+# Lista enlazada
+
+Lista enlazada simple en Python.
+
+## Pruebas
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+===FILE=== entrega-03-bueno/lista_enlazada.py
+"""Lista enlazada simple con busqueda y eliminacion por valor."""
+
+
+class Nodo:
+    """Nodo de la lista enlazada."""
+
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    """Lista enlazada simple (solo referencia a la cabeza)."""
+
+    def __init__(self):
+        self.cabeza = None
+
+    def esta_vacia(self):
+        """True si no hay elementos."""
+        return self.cabeza is None
+
+    def tamano(self):
+        """Numero de elementos."""
+        n = 0
+        actual = self.cabeza
+        while actual is not None:
+            n += 1
+            actual = actual.siguiente
+        return n
+
+    def insertar_inicio(self, valor):
+        """Inserta al inicio."""
+        nodo = Nodo(valor)
+        nodo.siguiente = self.cabeza
+        self.cabeza = nodo
+
+    def insertar_final(self, valor):
+        """Inserta al final."""
+        nodo = Nodo(valor)
+        if self.cabeza is None:
+            self.cabeza = nodo
+            return
+        actual = self.cabeza
+        while actual.siguiente is not None:
+            actual = actual.siguiente
+        actual.siguiente = nodo
+
+    def buscar(self, valor):
+        """True si el valor esta en la lista."""
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                return True
+            actual = actual.siguiente
+        return False
+
+    def eliminar(self, valor):
+        """Elimina la primera aparicion del valor.
+
+        Lanza ValueError si el valor no esta en la lista.
+        """
+        anterior = None
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                if anterior is None:
+                    self.cabeza = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                return
+            anterior = actual
+            actual = actual.siguiente
+        raise ValueError("El valor no esta en la lista")
+
+    def a_lista(self):
+        """Lista de Python con los valores."""
+        salida = []
+        actual = self.cabeza
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-03-bueno/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def setUp(self):
+        self.lista = ListaEnlazada()
+
+    def test_insertar_final(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertEqual(self.lista.a_lista(), [1, 2])
+
+    def test_insertar_inicio(self):
+        self.lista.insertar_inicio(1)
+        self.lista.insertar_inicio(2)
+        self.assertEqual(self.lista.a_lista(), [2, 1])
+
+    def test_buscar(self):
+        self.lista.insertar_final(3)
+        self.assertTrue(self.lista.buscar(3))
+        self.assertFalse(self.lista.buscar(4))
+
+    def test_eliminar(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.lista.eliminar(1)
+        self.assertEqual(self.lista.a_lista(), [2])
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-03-bueno/README.md
+# Lista Enlazada en Python
+
+Implementa una lista enlazada simple con inserción al inicio y al final,
+búsqueda y eliminación de un valor.
+
+## Uso
+
+```python
+from lista_enlazada import ListaEnlazada
+
+lista = ListaEnlazada()
+lista.insertar_final(1)
+lista.insertar_final(2)
+print(lista.a_lista())  # [1, 2]
+lista.eliminar(1)
+print(lista.a_lista())  # [2]
+```
+
+## Pruebas
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+
+Nota: `eliminar` lanza `ValueError` si el valor no está en la lista.
+===FILE=== entrega-15-bueno/lista_enlazada.py
+"""Estructura de lista enlazada simple que guarda una sucesion de valores."""
+
+
+class Celda:
+    """Celda de la lista: un valor y el enlace a la celda siguiente."""
+
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    """Lista enlazada con referencias al primero y al ultimo elemento."""
+
+    def __init__(self):
+        self.primero = None
+        self.ultimo = None
+        self.cantidad = 0
+
+    def esta_vacia(self):
+        return self.primero is None
+
+    def tamano(self):
+        return self.cantidad
+
+    def insertar_inicio(self, valor):
+        celda = Celda(valor)
+        celda.siguiente = self.primero
+        self.primero = celda
+        if self.ultimo is None:
+            self.ultimo = celda
+        self.cantidad += 1
+
+    def insertar_final(self, valor):
+        celda = Celda(valor)
+        if self.primero is None:
+            self.primero = celda
+            self.ultimo = celda
+        else:
+            self.ultimo.siguiente = celda
+            self.ultimo = celda
+        self.cantidad += 1
+
+    def buscar(self, valor):
+        recorrido = self.primero
+        while recorrido is not None:
+            if recorrido.valor == valor:
+                return True
+            recorrido = recorrido.siguiente
+        return False
+
+    def eliminar(self, valor):
+        previo = None
+        recorrido = self.primero
+        while recorrido is not None:
+            if recorrido.valor == valor:
+                if previo is None:
+                    self.primero = recorrido.siguiente
+                else:
+                    previo.siguiente = recorrido.siguiente
+                self.cantidad -= 1
+                return True
+            previo = recorrido
+            recorrido = recorrido.siguiente
+        return False
+
+    def a_lista(self):
+        salida = []
+        recorrido = self.primero
+        while recorrido is not None:
+            salida.append(recorrido.valor)
+            recorrido = recorrido.siguiente
+        return salida
+===FILE=== entrega-15-bueno/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def setUp(self):
+        self.lista = ListaEnlazada()
+
+    def test_insertar_final(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertEqual(self.lista.a_lista(), [1, 2])
+
+    def test_insertar_inicio(self):
+        self.lista.insertar_inicio(1)
+        self.lista.insertar_inicio(2)
+        self.assertEqual(self.lista.a_lista(), [2, 1])
+
+    def test_buscar(self):
+        self.lista.insertar_final(9)
+        self.assertTrue(self.lista.buscar(9))
+        self.assertFalse(self.lista.buscar(0))
+
+    def test_eliminar(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertTrue(self.lista.eliminar(1))
+        self.assertEqual(self.lista.a_lista(), [2])
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-15-bueno/README.md
+# Lista Enlazada Simple
+
+Estructura de datos de lista enlazada simple implementada en Python, con celdas
+enlazadas y referencias al primero y al último elemento.
+
+## Ejemplo
+
+```python
+from lista_enlazada import ListaEnlazada
+
+lista = ListaEnlazada()
+lista.insertar_final(1)
+lista.insertar_final(2)
+print(lista.a_lista())  # [1, 2]
+lista.eliminar(1)
+print(lista.a_lista())  # [2]
+```
+
+## Pruebas
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+===FILE=== entrega-11-bueno/lista_enlazada.py
+"""Lista enlazada simple para almacenar una secuencia de valores."""
+
+
+class Nodo:
+    """Nodo de la lista: un dato y el enlace al nodo siguiente."""
+
+    def __init__(self, dato):
+        self.dato = dato
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    """Lista enlazada con cabeza y cola para insertar en ambos extremos."""
+
+    def __init__(self):
+        self.cabeza = None
+        self.cola = None
+        self.longitud = 0
+
+    def esta_vacia(self):
+        return self.cabeza is None
+
+    def tamano(self):
+        return self.longitud
+
+    def insertar_inicio(self, dato):
+        nodo = Nodo(dato)
+        nodo.siguiente = self.cabeza
+        self.cabeza = nodo
+        if self.cola is None:
+            self.cola = nodo
+        self.longitud += 1
+
+    def insertar_final(self, dato):
+        nodo = Nodo(dato)
+        if self.cabeza is None:
+            self.cabeza = nodo
+            self.cola = nodo
+        else:
+            self.cola.siguiente = nodo
+            self.cola = nodo
+        self.longitud += 1
+
+    def buscar(self, dato):
+        actual = self.cabeza
+        while actual is not None:
+            if actual.dato == dato:
+                return True
+            actual = actual.siguiente
+        return False
+
+    def eliminar(self, dato):
+        anterior = None
+        actual = self.cabeza
+        while actual is not None:
+            if actual.dato == dato:
+                if anterior is None:
+                    self.cabeza = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                self.longitud -= 1
+                return True
+            anterior = actual
+            actual = actual.siguiente
+        return False
+
+    def a_lista(self):
+        resultado = []
+        actual = self.cabeza
+        while actual is not None:
+            resultado.append(actual.dato)
+            actual = actual.siguiente
+        return resultado
+===FILE=== entrega-11-bueno/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def setUp(self):
+        self.lista = ListaEnlazada()
+
+    def test_insertar_final(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertEqual(self.lista.a_lista(), [1, 2])
+
+    def test_insertar_inicio(self):
+        self.lista.insertar_inicio(1)
+        self.lista.insertar_inicio(2)
+        self.assertEqual(self.lista.a_lista(), [2, 1])
+
+    def test_buscar(self):
+        self.lista.insertar_final(9)
+        self.assertTrue(self.lista.buscar(9))
+        self.assertFalse(self.lista.buscar(0))
+
+    def test_eliminar(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertTrue(self.lista.eliminar(1))
+        self.assertEqual(self.lista.a_lista(), [2])
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-11-bueno/README.md
+# Lista Enlazada
+
+Lista enlazada simple en Python con nodos enlazados y referencias a la cabeza y
+a la cola.
+
+```python
+from lista_enlazada import ListaEnlazada
+
+lista = ListaEnlazada()
+lista.insertar_final(1)
+lista.insertar_final(2)
+lista.eliminar(1)
+print(lista.a_lista())  # [2]
+```
+===FILE=== entrega-04-bueno/lista_enlazada.py
+"""Lista enlazada simple."""
+
+
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    """Lista enlazada con inicio y fin."""
+
+    def __init__(self):
+        self.inicio = None
+        self.fin = None
+        self.n = 0
+
+    def esta_vacia(self):
+        return self.inicio is None
+
+    def tamano(self):
+        return self.n
+
+    def insertar_inicio(self, valor):
+        nodo = Nodo(valor)
+        nodo.siguiente = self.inicio
+        self.inicio = nodo
+        if self.fin is None:
+            self.fin = nodo
+        self.n += 1
+
+    def insertar_final(self, valor):
+        nodo = Nodo(valor)
+        if self.inicio is None:
+            self.inicio = nodo
+            self.fin = nodo
+        else:
+            self.fin.siguiente = nodo
+            self.fin = nodo
+        self.n += 1
+
+    def buscar(self, valor):
+        actual = self.inicio
+        while actual is not None:
+            if actual.valor == valor:
+                return True
+            actual = actual.siguiente
+        return False
+
+    def eliminar(self, valor):
+        anterior = None
+        actual = self.inicio
+        while actual is not None:
+            if actual.valor == valor:
+                if anterior is None:
+                    self.inicio = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                self.n -= 1
+                return
+            anterior = actual
+            actual = actual.siguiente
+
+    def a_lista(self):
+        salida = []
+        actual = self.inicio
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-04-bueno/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def setUp(self):
+        self.lista = ListaEnlazada()
+
+    def test_insertar(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.assertEqual(self.lista.a_lista(), [1, 2])
+
+    def test_insertar_inicio(self):
+        self.lista.insertar_inicio(0)
+        self.lista.insertar_final(1)
+        self.assertEqual(self.lista.a_lista(), [0, 1])
+
+    def test_buscar(self):
+        self.lista.insertar_final(1)
+        self.assertTrue(self.lista.buscar(1))
+        self.assertFalse(self.lista.buscar(2))
+
+    def test_eliminar(self):
+        self.lista.insertar_final(1)
+        self.lista.insertar_final(2)
+        self.lista.eliminar(2)
+        self.assertEqual(self.lista.a_lista(), [1])
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-04-bueno/README.md
+# Lista enlazada
+
+Lista enlazada simple en Python con inserción al inicio y al final, búsqueda y
+eliminación por valor.
+
+## Pruebas
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+===FILE=== entrega-05-bueno/lista_enlazada.py
+class Nodo:
+    def __init__(self, v):
+        self.v = v
+        self.sig = None
+
+
+class ListaEnlazada:
+    def __init__(self):
+        self.h = None
+
+    def esta_vacia(self):
+        return self.h is None
+
+    def tamano(self):
+        c = 0
+        x = self.h
+        while x is not None:
+            c += 1
+            x = x.sig
+        return c
+
+    def insertar_inicio(self, v):
+        n = Nodo(v)
+        n.sig = self.h
+        self.h = n
+
+    def insertar_final(self, v):
+        n = Nodo(v)
+        if self.h is None:
+            self.h = n
+            return
+        x = self.h
+        while x.sig is not None:
+            x = x.sig
+        x.sig = n
+
+    def buscar(self, v):
+        x = self.h
+        while x is not None:
+            if x.v == v:
+                return True
+            x = x.sig
+        return False
+
+    def eliminar(self, v):
+        ant = None
+        x = self.h
+        while x is not None:
+            if x.v == v:
+                if ant is None:
+                    self.h = x.sig
+                else:
+                    ant.sig = x.sig
+                return
+            ant = x
+            x = x.sig
+
+    def a_lista(self):
+        r = []
+        x = self.h
+        while x is not None:
+            r.append(x.v)
+            x = x.sig
+        return r
+===FILE=== entrega-05-bueno/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def test_insertar(self):
+        l = ListaEnlazada()
+        l.insertar_final(1)
+        l.insertar_final(2)
+        self.assertEqual(l.a_lista(), [1, 2])
+
+    def test_inicio(self):
+        l = ListaEnlazada()
+        l.insertar_inicio(1)
+        l.insertar_inicio(2)
+        self.assertEqual(l.a_lista(), [2, 1])
+
+    def test_buscar(self):
+        l = ListaEnlazada()
+        l.insertar_final(1)
+        self.assertTrue(l.buscar(1))
+        self.assertFalse(l.buscar(2))
+
+    def test_eliminar(self):
+        l = ListaEnlazada()
+        l.insertar_final(1)
+        l.insertar_final(2)
+        l.eliminar(1)
+        self.assertEqual(l.a_lista(), [2])
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-05-bueno/README.md
+# Lista enlazada
+
+Lista enlazada en python.
+
+Para probar:
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+===FILE=== entrega-06-basico/lista_enlazada.py
+"""Lista enlazada simple."""
+
+
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    def __init__(self):
+        self.cabeza = None
+
+    def esta_vacia(self):
+        return self.cabeza is None
+
+    def tamano(self):
+        n = 0
+        actual = self.cabeza
+        while actual is not None:
+            n += 1
+            actual = actual.siguiente
+        return n
+
+    def insertar_inicio(self, valor):
+        nodo = Nodo(valor)
+        nodo.siguiente = self.cabeza
+        self.cabeza = nodo
+
+    def insertar_final(self, valor):
+        nodo = Nodo(valor)
+        if self.cabeza is None:
+            self.cabeza = nodo
+            return
+        actual = self.cabeza
+        while actual.siguiente is not None:
+            actual = actual.siguiente
+        actual.siguiente = nodo
+
+    def eliminar(self, valor):
+        anterior = None
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                if anterior is None:
+                    self.cabeza = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                return
+            anterior = actual
+            actual = actual.siguiente
+
+    def a_lista(self):
+        salida = []
+        actual = self.cabeza
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-06-basico/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def test_insertar_final(self):
+        lista = ListaEnlazada()
+        lista.insertar_final(1)
+        lista.insertar_final(2)
+        self.assertEqual(lista.a_lista(), [1, 2])
+
+    def test_eliminar(self):
+        lista = ListaEnlazada()
+        lista.insertar_final(1)
+        lista.insertar_final(2)
+        lista.eliminar(1)
+        self.assertEqual(lista.a_lista(), [2])
+
+    def test_tamano(self):
+        lista = ListaEnlazada()
+        lista.insertar_final(1)
+        self.assertEqual(lista.tamano(), 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-06-basico/README.md
+# Lista enlazada
+
+Implementación de una lista enlazada simple en Python.
+
+Operaciones: insertar_inicio, insertar_final, eliminar, tamano, esta_vacia.
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+===FILE=== entrega-13-basico/lista_enlazada.py
+"""Lista enlazada simple."""
+
+
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    def __init__(self):
+        self.cabeza = None
+
+    def esta_vacia(self):
+        return self.cabeza is None
+
+    def tamano(self):
+        n = 0
+        actual = self.cabeza
+        while actual is not None:
+            n += 1
+            actual = actual.siguiente
+        return n
+
+    def insertar_inicio(self, valor):
+        nodo = Nodo(valor)
+        nodo.siguiente = self.cabeza
+        self.cabeza = nodo
+
+    def insertar_final(self, valor):
+        nodo = Nodo(valor)
+        if self.cabeza is None:
+            self.cabeza = nodo
+            return
+        actual = self.cabeza
+        while actual.siguiente is not None:
+            actual = actual.siguiente
+        actual.siguiente = nodo
+
+    def buscar(self, valor):
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                return True
+            actual = actual.siguiente
+        return False
+
+    def eliminar(self, valor):
+        # busca el valor y enlaza el anterior con el siguiente
+        anterior = self.cabeza
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                anterior.siguiente = actual.siguiente
+                return
+            anterior = actual
+            actual = actual.siguiente
+
+    def a_lista(self):
+        salida = []
+        actual = self.cabeza
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-13-basico/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def test_insertar_final(self):
+        lista = ListaEnlazada()
+        lista.insertar_final(1)
+        lista.insertar_final(2)
+        self.assertEqual(lista.a_lista(), [1, 2])
+
+    def test_buscar(self):
+        lista = ListaEnlazada()
+        lista.insertar_final(1)
+        self.assertTrue(lista.buscar(1))
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-13-basico/README.md
+# Lista enlazada en Python
+
+Lista enlazada simple con inserción, búsqueda y eliminación por valor.
+
+Ejecutar pruebas:
+
+```bash
+python -m unittest test_lista_enlazada.py
+```
+===FILE=== entrega-07-basico/lista_enlazada.py
+"""Lista enlazada."""
+
+
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    def __init__(self):
+        self.cabeza = None
+
+    def insertar_final(self, valor):
+        nodo = Nodo(valor)
+        if self.cabeza is None:
+            self.cabeza = nodo
+            return
+        actual = self.cabeza
+        while actual.siguiente is not None:
+            actual = actual.siguiente
+        actual.siguiente = nodo
+
+    def buscar(self, valor):
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                return True
+            actual = actual.siguiente
+        return False
+
+    def eliminar(self, valor):
+        anterior = None
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                if anterior is None:
+                    self.cabeza = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                return
+            anterior = actual
+            actual = actual.siguiente
+
+    def a_lista(self):
+        salida = []
+        actual = self.cabeza
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-07-basico/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def test_insertar_y_buscar(self):
+        lista = ListaEnlazada()
+        lista.insertar_final(1)
+        self.assertTrue(lista.buscar(1))
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-07-basico/README.md
+# Lista enlazada
+Tarea de estructuras de datos.
+===FILE=== entrega-08-basico/lista_enlazada.py
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    def __init__(self):
+        self.cabeza = None
+
+    def esta_vacia(self):
+        return self.cabeza is None
+
+    def insertar_inicio(self, valor):
+        nodo = Nodo(valor)
+        nodo.siguiente = self.cabeza
+        self.cabeza = nodo
+
+    def insertar_final(self, valor):
+        nodo = Nodo(valor)
+        if self.cabeza is None:
+            self.cabeza = nodo
+            return
+        actual = self.cabeza
+        while actual.siguiente is not None:
+            actual = actual.siguiente
+        actual.siguiente = nodo
+
+    def eliminar(self, valor):
+        anterior = None
+        actual = self.cabeza
+        while actual is not None:
+            if actual.valor == valor:
+                if anterior is None:
+                    self.cabeza = actual.siguiente
+                else:
+                    anterior.siguiente = actual.siguiente
+                return
+            anterior = actual
+            actual = actual.siguiente
+
+    def a_lista(self):
+        salida = []
+        actual = self.cabeza
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-08-basico/test_lista_enlazada.py
+import unittest
+
+from lista_enlazada import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def test_insertar_final(self):
+        lista = ListaEnlazada()
+        lista.insertar_final(1)
+        lista.insertar_final(2)
+        self.assertEqual(lista.a_lista(), [1, 2])
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-09-insuficiente/lista_enlazada.py
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.siguiente = None
+
+
+class ListaEnlazada:
+    def __init__(self):
+        self.cabeza = None
+        self.n = 0
+
+    def insertar_final(self, valor):
+        nodo = Nodo(valor)
+        nodo.siguiente = self.cabeza
+        self.cabeza = nodo
+        self.n += 1
+
+    def eliminar(self, valor):
+        self.cabeza = self.cabeza.siguiente
+
+    def buscar(self, valor):
+        actual = self.cabeza
+        if actual is not None and actual.valor == valor:
+            return True
+        return False
+
+    def tamano(self):
+        return self.n
+
+    def a_lista(self):
+        salida = []
+        actual = self.cabeza
+        while actual is not None:
+            salida.append(actual.valor)
+            actual = actual.siguiente
+        return salida
+===FILE=== entrega-09-insuficiente/test_lista_enlazada.py
+import unittest
+
+from lista import ListaEnlazada
+
+
+class TestListaEnlazada(unittest.TestCase):
+    def test_insertar(self):
+        lista = ListaEnlazada()
+        lista.insertar_final(1)
+        self.assertEqual(lista.tamano(), 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
+===FILE=== entrega-09-insuficiente/README.md
+# Lista
+Tarea lista enlazada.
+===FILE=== entrega-14-insuficiente/lista_enlazada.py
+class Nodo:
+    def __init__(self, v):
+        self.v = v
+        self.sig = None
+
+
+class ListaEnlazada:
+    def __init__(self):
+        self.cabeza = None
+
+    def insertar(self, v):
+        nodo = Nodo(v)
+        nodo.sig = self.cabeza
+        self.cabeza = nodo
+
+    def eliminar(self, v):
+        actual = self.cabeza
+        while actual is not None:
+            if actual.v == v:
+                actual = actual.sig
+            actual = actual.sig
+
+    def mostrar(self):
+        actual = self.cabeza
+        while actual:
+            print(actual.v)
+            actual = actual.sig
+===FILE=== entrega-14-insuficiente/README.md
+# tarea lista enlazada
+implementacion en python
+===FILE=== entrega-10-insuficiente/lista_enlazada.py
+class Nodo:
+    def __init__(self, x):
+        self.x = x
+
+
+class Lista:
+    def __init__(self):
+        self.datos = None
+
+    def agregar(self, x):
+        self.datos = Nodo(x)
+
+    def quitar(self, x):
+        self.datos = None

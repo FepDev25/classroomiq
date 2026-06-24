@@ -33,6 +33,23 @@ Rúbrica: `tarea-pila-python/rubrica.json` (entrega tipo **código**, 20 pts, `m
 
 Las etiquetas por criterio están en `tarea-pila-python/etiquetas-esperadas.json`.
 
+### `lista-enlazada-python/`
+
+Rúbrica: `lista-enlazada-python/rubrica.json` (entrega tipo **código**, 20 pts, `modoTotal: suma`), sembrada en el sistema como `Estructuras de Datos` (ver `backend/src/main/resources/seed/rubricas/lista-enlazada-python.json` y su espejo en `data/rubricas-ejemplo/`). Tarea ficticia: implementar una lista enlazada simple en Python (inserción en ambos extremos, eliminación por valor y búsqueda) con pruebas y README.
+
+Pensado para una **demo de lote grande**: 15 entregas ficticias repartidas en los cuatro niveles, para mostrar que la herramienta acelera la revisión de muchos trabajos sin quitarle el criterio al docente. Los `.zip` listos para subir están en `lista-enlazada-python/zips/` (uno por estudiante ficticio); cada uno contiene los archivos fuente en la raíz, como espera el pipeline de código.
+
+| Rango | Entregas | Total esperado |
+|---|---|---|
+| Excelente   | `01-ana-torres`, `02-bruno-mendez`, `12-luis-bravo`                                  | 18–20 |
+| Bueno       | `03-carla-rios`, `04-diego-fuentes`, `05-elena-paredes`, `11-karina-lucero`, `15-paula-herrera` | 14–16 |
+| Básico      | `06-fabian-soto`, `07-gabriela-nunez`, `08-hugo-ramirez`, `13-maria-salas`          | 8–11 |
+| Insuficiente| `09-ines-cardenas`, `10-javier-ortega`, `14-nicolas-vega`                           | 3–6 |
+
+Las entregas **11 (karina-lucero)** y **15 (paula-herrera)** son gemelas semánticas (misma lógica, identificadores y comentarios distintos): sirven para demostrar la **detección de similitud semántica** como alerta de revisión manual.
+
+Las etiquetas por criterio están en `lista-enlazada-python/etiquetas-esperadas.json`. Los directorios `entrega-*/` y los `zips/` se regeneran de forma reproducible con `lista-enlazada-python/_generar.py` a partir de `_entregas.bundle`.
+
 ## Cómo se usan (Fase 4)
 
 1. Sembrar la rúbrica correspondiente y subir cada entrega como una entrega del lote.
