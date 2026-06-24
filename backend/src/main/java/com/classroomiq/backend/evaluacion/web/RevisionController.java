@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.classroomiq.backend.evaluacion.RevisionService;
 import com.classroomiq.backend.evaluacion.dto.BorradorResponse;
 import com.classroomiq.backend.evaluacion.dto.ComentarioRequest;
-import com.classroomiq.backend.evaluacion.dto.CriterioEvaluadoResponse;
 import com.classroomiq.backend.evaluacion.dto.CriterioRevisionRequest;
 
 import jakarta.validation.Valid;
@@ -43,7 +42,7 @@ public class RevisionController {
 
     /** Edita un criterio del borrador (puntaje/nivel/justificación/toggle revisado). */
     @PatchMapping("/evaluaciones/{evaluacionId}/criterios/{criterioId}")
-    public CriterioEvaluadoResponse editarCriterio(@PathVariable UUID evaluacionId,
+    public BorradorResponse editarCriterio(@PathVariable UUID evaluacionId,
             @PathVariable UUID criterioId, @Valid @RequestBody CriterioRevisionRequest request) {
         return revision.editarCriterio(evaluacionId, criterioId, request);
     }

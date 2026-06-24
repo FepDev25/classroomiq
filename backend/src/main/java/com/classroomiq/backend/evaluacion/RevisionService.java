@@ -69,7 +69,7 @@ public class RevisionService {
     }
 
     @Transactional
-    public CriterioEvaluadoResponse editarCriterio(UUID evaluacionId, UUID criterioEvalId,
+    public BorradorResponse editarCriterio(UUID evaluacionId, UUID criterioEvalId,
             CriterioRevisionRequest request) {
         Evaluacion eval = cargarPropiaEditable(evaluacionId);
         EvaluacionCriterio ec = criterios.findById(criterioEvalId)
@@ -85,7 +85,9 @@ public class RevisionService {
         ec.setRevisadoManual(request.revisadoManual());
         criterios.save(ec);
 
-        return construirCriterio(ec, criterio);
+        // Devuelve el borrador completo (contrato: BorradorResponse) para que el cliente refresque la
+        // lista de criterios y el total proyectado de una sola vez tras cada edición.
+        return construirBorrador(eval);
     }
 
     @Transactional

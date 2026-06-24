@@ -121,8 +121,9 @@ class RevisionApiTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON).content(edicion))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.puntajeFinal").value(9))
-                .andExpect(jsonPath("$.revisadoManual").value(true));
+                // Devuelve el borrador completo (no solo el criterio editado).
+                .andExpect(jsonPath("$.criterios[0].puntajeFinal").value(9))
+                .andExpect(jsonPath("$.criterios[0].revisadoManual").value(true));
 
         // PATCH comentario general.
         mvc.perform(patch("/api/evaluaciones/" + evaluacionId + "/comentario")

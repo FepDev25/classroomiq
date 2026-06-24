@@ -22,7 +22,7 @@ import com.classroomiq.backend.usuario.repository.UsuarioRepository;
 
 /**
  * Verifica el seed end-to-end: arranca con {@code app.seed.enabled=true} (sobrescribe el default
- * de los tests) y comprueba que la siembra parsea las 4 rúbricas de ejemplo y crea los datos.
+ * de los tests) y comprueba que la siembra parsea las 5 rúbricas de ejemplo y crea los datos.
  */
 @SpringBootTest(properties = "app.seed.enabled=true")
 @Import(TestcontainersConfiguration.class)
@@ -53,8 +53,8 @@ class SeederTest {
 
         TenantContext.set(tenantId);
         try {
-            assertThat(rubricas.count()).isEqualTo(4);
-            assertThat(materias.count()).isEqualTo(3);
+            assertThat(rubricas.count()).isEqualTo(5);
+            assertThat(materias.count()).isEqualTo(4);
             assertThat(usuarios.findByEmail("admin@demo.local"))
                     .get().extracting(Usuario::getRol).isEqualTo(Rol.ADMIN);
             assertThat(usuarios.findByEmail("docente@demo.local")).isPresent();
